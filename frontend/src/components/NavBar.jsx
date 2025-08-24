@@ -1,8 +1,6 @@
 // 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import '../style.css'
 import { Link } from 'react-router-dom';
 import Logo from "../assets/logo.png";
@@ -17,6 +15,7 @@ const navigation = [
 
 export default function NavBar() {
    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+   const [isCartOpen, setIsCartOpen] = useState(false);
 
 
   return (
@@ -29,8 +28,8 @@ export default function NavBar() {
          <div className="absolute left-6">
           <img
           alt="Logo"
-          src={Logo}
-          style={{marginLeft:'15px', width:'200px'}}
+          src="https://dcassetcdn.com/design_img/3115551/18140/18140_17253961_3115551_325d68d7_image.png"
+          style={{marginLeft:'15px', width:'50px'}}
           />
         </div>
            
@@ -47,31 +46,17 @@ export default function NavBar() {
         </div>
 
 
-       {/* ✅ Hamburger Button */}
-        {/* <button
-          className="hamburger"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? "✖" : "☰"}
-        </button> */}
-
-      {/* Mobile Menu */}
-       {/* {menuOpen && (
-        <ul className="mobile-menu">
-          <li><a href="#home" onClick={() => setMenuOpen(false)}>Home</a></li>
-          <li><a href="#about" onClick={() => setMenuOpen(false)}>About</a></li>
-          <li><a href="#services" onClick={() => setMenuOpen(false)}>Services</a></li>
-          <li><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a></li>
-        </ul>
-      )} */}
-
 
         {/* cart & login */}
         <div className="flex absolute right-6 gap-4">
-          
+          <div
+            onClick={() => setIsCartOpen(true)}
+            className="cursor-pointer hover:text-pink-600"
+          >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bag logo" viewBox="0 0 16 16">
           <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
           </svg>
+          </div>
           
         
           
@@ -85,7 +70,35 @@ export default function NavBar() {
         </div>
         
       </div>
+
     </nav> 
+
+    {/* Cart Drawer */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Background Overlay */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40"
+            onClick={() => setIsCartOpen(false)}
+          />
+
+          {/* Drawer Panel */}
+          <div className="ml-auto w-80 h-full bg-white shadow-lg p-6 relative animate-slide-in">
+            <button
+              className="absolute top-4 right-4 text-gray-500"
+              onClick={() => setIsCartOpen(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-semibold mb-4">Your Cart</h2>
+            <p>No items yet.</p>
+          </div>
+        </div>
+      )}
+
+
+
+  
 </div>
 
 

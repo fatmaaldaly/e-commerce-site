@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 
 
 export default function Register(){
+    const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -15,7 +16,7 @@ export default function Register(){
     const handleRegister= async (e) => {
         e.preventDefault();
         try{
-            const res = await axios.post("http://localhost:5000/api/register", {email, password})
+            const res = await axios.post("http://localhost:5000/api/register", {fullName, email, password})
             alert("user registered successfully");
             setError("");
 
@@ -33,6 +34,12 @@ export default function Register(){
             <div className="login-content">
             <h2 className="login-title">Register</h2>
             {error && <p style={{ color: "red" }}>{error}</p>}
+            <input type="text" 
+              placeholder="Full name" 
+              className="login-input" 
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)} required>
+            </input>
             <input type="text" 
               placeholder="Email" 
               className="login-input" 

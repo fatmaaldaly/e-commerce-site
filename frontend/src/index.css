@@ -73,5 +73,12 @@ button:focus-visible {
 
 /* @tailwind base; */
 /*@tailwind components;  */
-@import "tailwindcss/preflight";
+/* @import "tailwindcss/preflight"; */
 /* @tailwind utilities; */
+
+/* v4 syntax */
+@import "tailwindcss"; 
+@import "tailwindcss/preflight";  
+@import "tailwindcss/utilities";
+/* @source "../node_modules/@my-company/ui"; optional if needed */
+
