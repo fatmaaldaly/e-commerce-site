@@ -1,25 +1,18 @@
 import React from "react";
 
-
-export default function Features(){
-    return(
-        <div className="section">
-        <h2 className="section-title" style={{color:"white"}}>Features</h2>
-        <div className="flavors-container">
-            <div className="grid">
-          
-   
+export default function Features() {
+    return (
+        <div className="features">
+            
+            <div className="features-container">
+                <h1 className="features-title">Features</h1>
+                <div className="grid-features">
+                    
+                </div>
+            </div>
         </div>
-        
-        
-        
-      </div>
-    </div>
-        
-
-        
     );
-};
+}
 
 
 

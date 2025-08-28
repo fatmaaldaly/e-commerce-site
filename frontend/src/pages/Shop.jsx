@@ -71,19 +71,19 @@ const products = [
     id: 4,
     name: "Box of 3",
     price: "LE 50",
-    image: "",
+    image: "https://cookievore.com/cdn/shop/files/nutellabox_1c435361-ae48-445b-bd3c-09602637243f.png?v=1742915545&width=600",
   },
   {
     id: 5,
     name: "Box of 6",
     price: "LE 60",
-    image: "",
+    image: "https://cookievore.com/cdn/shop/files/nutellabox_1c435361-ae48-445b-bd3c-09602637243f.png?v=1742915545&width=600",
   },
   {
     id: 6,
     name: "",
     price: "LE 50",
-    image: "",
+    image: "https://cookievore.com/cdn/shop/files/nutellabox_1c435361-ae48-445b-bd3c-09602637243f.png?v=1742915545&width=600",
   },
 ]
 
