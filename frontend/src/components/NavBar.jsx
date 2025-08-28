@@ -1,9 +1,7 @@
-
-
 import { useState } from 'react'
 import '../style.css'
 import { Link } from 'react-router-dom';
-import Logo from "../assets/logo.png";
+
 
 
 
@@ -14,7 +12,7 @@ const navigation = [
 ]
 
 export default function NavBar() {
-   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+   const [isMenuOpen, setIsMenuOpen] = useState(false);
    const [isCartOpen, setIsCartOpen] = useState(false);
 
 
@@ -25,15 +23,15 @@ export default function NavBar() {
     <nav className="nav">
       <div className="container">
         <div className="nav-content">           
-         <div className="absolute left-6">
+         {/* <div className="absolute left-6">
           <img
           alt="Logo"
           src="https://dcassetcdn.com/design_img/3115551/18140/18140_17253961_3115551_325d68d7_image.png"
           style={{marginLeft:'15px', width:'50px'}}
           />
-        </div>
+        </div> */}
            
-        <div className="nav-links">
+        {/* <div className="nav-links">
                 {navigation.map((item) =>(
                     <a 
                     key={item.name}
@@ -43,7 +41,28 @@ export default function NavBar() {
                     {item.name}    
                     </a>
                 ))}
+        </div> */}
+
+        
+        {/* Hamburger */}
+        <button
+          className="hamburger-btn"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          ☰
+        </button>
+
+        {/* Centered Logo */}
+        <div className="logo-container">
+          <img
+            alt="Logo"
+            src=""
+            style={{ width: "50px" }}
+          />
         </div>
+
+
+
 
 
 
