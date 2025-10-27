@@ -1,34 +1,46 @@
-import { Link, useNavigate } from "react-router-dom";
-import React from "react";
+import { data, Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import axios from "axios";
-
+import NavBar from "../components/NavBar";
 
 
 export default function Login() {  
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate(); // 👈 initialize
+    const navigate = useNavigate(); 
 
 
-   const handleLogin = async (e) => {
-      e.preventDefault();
-      try{
-        const res = await axios.post("http://localhost:5000/api/login", {email, password}, { headers: { "Content-Type": "application/json" } });
-        localStorage.setItem("token", res.data.token); // save jwt
-        alert("login successfull")
-        setError("")
-        navigate("/");
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-      }catch(err){
-        setError(err.response?.data?.error);
+    try {
+      const res = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
+      const data = await res.json();
+
+      if (res.ok) {
+        // token is saved locally in the browser, so the user can stay logged in.
+        localStorage.setItem("token", data.token); 
+        navigate("/"); 
+      } else {
+        alert(data.message || "Login failed");
       }
-    };
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong!");
+    }
+  };
+
 
 
     return (
+      // <div >
+      //  <NavBar />
         <div className="login-container">
             
             <div className="login-content">
@@ -56,8 +68,8 @@ export default function Login() {
         </div> 
         </div>
     
-    
-   
+
+  //  </div>
 
   );
 }

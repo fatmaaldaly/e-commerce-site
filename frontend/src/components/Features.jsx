@@ -1,50 +1,48 @@
-import React from 'react';
-import QualityIcon from '../assets/quality.svg';
-import FreshIcon from '../assets/cookie.svg';
-import DeliveryIcon from '../assets/truck.svg';
+import { useEffect } from "react";
+import offers from "../assets/offers.png";
+import shop from "../assets/shop.png";
+import 'animate.css'; // library that provides pre-built animation classes
+import AOS from 'aos'; // for scroll-based animations
+import 'aos/dist/aos.css'; // CSS file that comes with the AOS library
 
 
-const features = [
-    {
-        title: "Freshly Baked",
-        description: "Our cookies are baked fresh every day using the finest ingredients.",
-        icon:  <img src={FreshIcon} alt="Good quality" style={{width: "2.5rem"}} />
-    },
-    {
-        title: "Good quality",
-        description: "Create your own cookie flavors and designs for special occasions.",
-        icon:  <img src={QualityIcon} alt="Good quality" style={{width: "2.5rem"}} />
-    },
-    {
-        title: "Fast Delivery",
-        description: "Enjoy our cookies delivered right to your doorstep, fresh and warm.",
-        icon:  <img src={DeliveryIcon} alt="Good quality" style={{width: "2.5rem"}} />
-    }
+const ITEMS = [
+  {
+    src: offers,
+    alt: "Exclusive online deals",
+    text: "Exclusive online deals",
+  },
+  {
+    src: shop,
+    alt: "Shop online from over 10,000 items",
+    text: "Shop online from over 10,000 items",
+  },
 ];
 
 
+export default function Features() {
+  useEffect(() => {
+    AOS.init({
+      duration: 1000, // animation duration in ms
+      once: true, // only animate once when scrolling
+    });
+  }, []);
 
-
-function Features ()  {
-    return (
-
-        
-        <div className="features-container">
-            <h2 className='features-title'>Why Choose Us?</h2>
-            <div className="features-grid">
-                {features.map((feature, index) => (
-                    <div className="feature-card blurry-bg" key={index}>
-                        <div className="feature-icon">{feature.icon}</div>
-                        <h3>{feature.title}</h3>
-                        <p className='features-description'>{feature.description}</p>
-                    </div>
-                ))}
+  return (
+    <section className="features-section">
+      <div className="features-container">
+        {ITEMS.map((item, index) => (
+          <div className="features-item" key={index} data-aos="fade-right">
+            <div className="features-icon">
+              <img src={item.src} alt={item.alt} />
             </div>
-        </div>
-    );
-};
-
-export default Features;
+            <p className="features-text">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 
 

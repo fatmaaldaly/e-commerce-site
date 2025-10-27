@@ -1,29 +1,28 @@
-import { useState } from 'react'
-import './App.css'
-import Home from './pages/Home'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Shop from "./pages/Shop"
-
+import Shop from "./pages/Shop";
+import NavBar from "./components/NavBar";
+import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  return (
 
-  return(
-    // <Home/>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login setToken={setToken} />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/shop" element={<Shop />} />
-      </Routes> 
-    </BrowserRouter> 
+        <BrowserRouter>
+        <ScrollToTop /> {/* 👈 this makes navigation start at top */}
+          <NavBar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
 
   );
-  
-
 }
 
-export default App
+export default App;

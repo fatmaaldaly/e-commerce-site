@@ -1,124 +1,105 @@
-import React from 'react';
-import NavBar from '../components/NavBar';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-// import Footer from '@/components/Footer';
-import Footer from '../components/Footer';
+import React, { useEffect, useState } from "react";
+import CategoryList from "../components/CategoryList";
+import { useLocation } from "react-router-dom";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 
+export default function Shop() {
+  const [products, setProducts] = useState([]); 
+  const [filteredProducts, setFilteredProducts] = useState([]); 
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const location = useLocation(); // 👈 get current URL info
 
-// const products = [
-//   { id: 1, name: "Chocolate Chip", price: 50 },
-//   { id: 2, name: "Dark chocolate", price: 60 },
-//   { id: 3, name: "White chocolate", price: 50 },
-// ]
+  // Read the category from URL query parameter
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const categoryFromURL = decodeURIComponent(queryParams.get("category") || "");
 
+    if (categoryFromURL) {
+      setSelectedCategory(categoryFromURL);
+    }
+  }, [location]);
 
-// export default function Shop() {
-
-
-    
-
-//     return(
-//         <div >
-//             <NavBar />
-       
-         
-//         <div className="product-section">
-        
-//             <div className="product-boxes">
-//                 {products.map((product) => (
-//                     <div key={product.id} className="product-box">
-//                         <img src=""/>
-                       
-//                         <h3 className="product-name">{product.name}</h3>
-//                         <p className="product-price">Price: ${product.price}</p>
-//                         <button className="add-to-cart-btn">Add to Cart</button>
-//                     </div>
-//                 ))}
-//             </div>
-            
-//         </div>
-//         </div>
+  // Fetch products
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        setFilteredProducts(data); 
+      })
+      .catch((err) => console.error("Error fetching products:", err));
+  }, []);
 
 
 
+  // const handleCategoryClick = (categoryName) => {
+  //   setSelectedCategory(categoryName);
+  //   if (categoryName === "All") {
+  //     setFilteredProducts(products);
+  //   } else {
+  //     const filtered = products.filter(
+  //       (p) => p.category_name === categoryName
+  //     );
+  //     setFilteredProducts(filtered);
+  //   }
+  // };
+  // Apply filtering whenever selectedCategory or products change
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter(
+        (p) => p.category_name === selectedCategory
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [selectedCategory, products]);
 
-//     );
-    
-// }
+  // Handle sidebar category click
+  const handleCategoryClick = (categoryName) => {
+    setSelectedCategory(categoryName);
+  };
 
 
-const products = [
-  {
-    id: 1,
-    name: "Milk chocolate",
-    price: "LE 50",
-    image: "https://cookievore.com/cdn/shop/files/ori.png?v=1749592334&width=600",
-  },
-  {
-    id: 2,
-    name: "Dark chocolate",
-    price: "LE 60",
-    image: "https://cookievore.com/cdn/shop/files/cadbury.png?v=1743877731&width=600",
-  },
-  {
-    id: 3,
-    name: "White chocolate",
-    price: "LE 50",
-    image: "https://cookievore.com/cdn/shop/files/white-single.png?v=1749546225&width=600",
-  },
-  {
-    id: 4,
-    name: "Box of 3",
-    price: "LE 50",
-    image: "https://cookievore.com/cdn/shop/files/nutellabox_1c435361-ae48-445b-bd3c-09602637243f.png?v=1742915545&width=600",
-  },
-  {
-    id: 5,
-    name: "Box of 6",
-    price: "LE 60",
-    image: "https://cookievore.com/cdn/shop/files/nutellabox_1c435361-ae48-445b-bd3c-09602637243f.png?v=1742915545&width=600",
-  },
-  {
-    id: 6,
-    name: "",
-    price: "LE 50",
-    image: "https://cookievore.com/cdn/shop/files/nutellabox_1c435361-ae48-445b-bd3c-09602637243f.png?v=1742915545&width=600",
-  },
-]
-
-export default function ProductList() {
   return (
-    
+    // <div >
+    //    <NavBar />
+      <div className="shop-content">
+        {/* Sidebar */}
+        
+        <aside className="shop-sidebar">
+          
+          <CategoryList
+          onCategoryClick={handleCategoryClick}
+          selectedCategory={selectedCategory}
+          />
+        </aside>
 
-<section className="product">
-       
-        <NavBar />
-
-<div className="product-grid">
-  {products.map((product) => (
-    <Card key={product.id} className="product-card">
-      <CardContent className="flex flex-col items-center">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="product-image"
-        />
-      </CardContent>
-
-      <CardTitle className="product-title">{product.name}</CardTitle>
-
-      <CardFooter className="product-footer">
-        <p className="product-price">{product.price}</p>
-        <Button className="product-button">Add to Cart</Button>
-      </CardFooter>
-    </Card>
-  ))}
-</div>
-<div style={{ marginTop: "100px" }}>
-  <Footer />
-</div>
-</section>
-    
+        {/* Product Grid */}
+      <main className="shop-products">
+        {filteredProducts.length > 0 ? (
+          <div className="product-grid">
+            {filteredProducts.map((product) => (
+              <div key={product.product_id} className="product-card">
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="product-image"
+                  
+                />
+                <h3 className="product-name">{product.name}</h3>
+                <p className="product-price">${product.price}</p>
+                <button className="add-to-cart">Add to Cart</button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="no-products">No products found.</p>
+        )}
+      </main>
+      </div>
+//       {/* <Footer/>
+// </div> */}
   );
 }

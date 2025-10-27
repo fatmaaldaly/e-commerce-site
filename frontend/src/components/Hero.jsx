@@ -5,69 +5,67 @@
 // import 'aos/dist/aos.css';
 // import { useEffect } from 'react';
 
+// export default function Hero(){
 
-// export default function Hero() {
-//     useEffect(() => {
-//     AOS.init({ duration: 1000 });
-//   }, []);
 
-//     return (
-//         <section id="home" className="hero">
-//             <div className="hero-content-container">
-//                 <h2 className="hero-title" data-aos="fade-right" data-aos-duration="1000">Freshly Baked Cookies</h2>
-                 
-//                 <div className="orderNow-btn" data-aos="fade-up"> 
-//                  <button >Order now</button>
-//                 </div>
-//             </div>
+//     return(
 
-//             <div className='hero-image-container'>
-//                 <img src={Cookies} alt='cookies'/>
-//             </div>
-//         </section>
+//     <div className="hero-container">
+       
+//         </div>
+
 //     );
 // }
-// import React from 'react';
 
-const Hero = () => {
+
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import offers from "../assets/offers.png"
+
+const HERO_IMAGES = [
+  {
+    src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2321/desktop/big/desktop-en.jpg?1754308080",
+    alt: "Imported Grocery",
+  },
+//   {
+//     src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2606/desktop/big/gift-card-desktop-en.jpg?1750601060",
+//     alt: "Exclusive Offers",
+//   },
+//   {
+//     src: "",
+//     alt: "Best Deals",
+//   },
+];
+
+export default function Hero() {
   return (
-//     <div className="video-background-container" style={{position: 'relative', overflow: 'hidden', width: '100%', height: '100vh'}}>
-//       <iframe
-//         src="https://www.youtube.com/embed/O5sGmP2iakw?autoplay=1&mute=1&controls=0&loop=1&playlist=O5sGmP2iakw&modestbranding=1&showinfo=0&rel=0"
-//         title="YouTube video player"
-//         frameBorder="0"
-//         allow="autoplay; encrypted-media"
-//         allowFullScreen
-//         style={{
-//           position: 'absolute',
-//           top: 0,
-//           left: 0,
-//           width: '100vw',
-//           height: '100vh',
-//           pointerEvents: 'none',
-//           zIndex: 0,
-//         }}
-//       ></iframe>
-//       <div className="content" style={{position: 'relative', zIndex: 1, color: 'white', textAlign: 'center'}}>
-//         <h1>Your Title</h1>
-//         <p>Your content here.</p>
-//       </div>
-//     </div>
-//   );
-// };
-
- 
-        <div className="hero-container">
-       
-            {/* <div className="hero-content">
-                <h1>Indulge in Our Freshly Baked Cookies</h1>
-                <p>Made with Love and the Finest Ingredients</p>
-                <button className="cta-button">Order Now</button>
-            </div> */}
-        </div>
-
-    );
+    <section className="hero-section">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        loop
+        className="hero-swiper"
+      >
+        {HERO_IMAGES.map((item, index) => (
+          <SwiperSlide key={index}>
+            <img className="hero-image" src={item.src} alt={item.alt} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
+  );
 }
 
-export default Hero;
+
+
+ 
+        
+
+
 

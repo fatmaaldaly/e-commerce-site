@@ -1,9 +1,6 @@
 import {useState} from "react";
-import axios from "axios";
-import '../style.css'
-import { Link } from 'react-router-dom'
-
-
+import { Link, useNavigate } from 'react-router-dom'
+import NavBar from "../components/NavBar";
 
 
 export default function Register(){
@@ -11,26 +8,52 @@ export default function Register(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
+    const handleRegister = async (e) => {
+    e.preventDefault();
 
-    const handleRegister= async (e) => {
-        e.preventDefault();
-        try{
-            const res = await axios.post("http://localhost:5000/api/register", {fullName, email, password})
-            alert("user registered successfully");
-            setError("");
+    try {
+      const res = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        // tells the backend the data im sending is in json format, So the backend knows it should parse the request body as JSON, not as plain text
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-        }catch(err){
-             setError(err.response?.data?.error);
+        
+        // converts a JavaScript object to a json string, sends data in this format to backend
+        body: JSON.stringify({
+          fullName: fullName,  
+          email: email,
+          password: password,
+        }),
+      });
 
-        }
-    };
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      localStorage.setItem("token", data.token); 
+      navigate("/");
+      setError("");
+
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError(err.message || "Something went wrong");
+    }
+  };
+
 
 
 
 
     return(
+       
          <div className="login-container">
+        
             <div className="login-content">
             <h2 className="login-title">Register</h2>
             {error && <p style={{ color: "red" }}>{error}</p>}
