@@ -6,12 +6,13 @@ import Shop from "./pages/Shop";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import { CartProvider } from "./context/CartContext";
 
 function App() {
   return (
-
+      <CartProvider>
         <BrowserRouter>
-        <ScrollToTop /> {/* 👈 this makes navigation start at top */}
+        <ScrollToTop /> 
           <NavBar />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -21,7 +22,7 @@ function App() {
           </Routes>
           <Footer />
         </BrowserRouter>
-
+      </CartProvider>
   );
 }
 

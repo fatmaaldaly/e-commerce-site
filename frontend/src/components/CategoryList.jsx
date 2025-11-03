@@ -4,10 +4,14 @@ import React, { useEffect, useState } from "react";
 export default function CategoryList({ onCategoryClick, selectedCategory }) {
   const [categories, setCategories] = useState([]);
 
+  // loads all categories from the backend when the sidebar first shows up
   useEffect(() => {
     fetch("http://localhost:5000/api/categories")
       .then((res) => res.json())
-      .then((data) => setCategories(data))
+      .then((data) =>{
+        // Add "All" manually at the start of the list
+        const allCategories = [{ category_id: 0, name: "All" }, ...data];
+       setCategories(allCategories)})
       .catch((err) => console.error("Error fetching categories:", err));
   }, []);
 

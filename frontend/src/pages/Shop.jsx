@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import CategoryList from "../components/CategoryList";
 import { useLocation } from "react-router-dom";
-import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
+import { useCart } from "../context/CartContext";
 
 export default function Shop() {
   const [products, setProducts] = useState([]); 
   const [filteredProducts, setFilteredProducts] = useState([]); 
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const location = useLocation(); // 👈 get current URL info
+  const location = useLocation();
+  const { addToCart } = useCart();
 
   // Read the category from URL query parameter
+  // Run the code inside every time the URL/location changes.
   useEffect(() => {
+    // gives the part of the URL after ? (for ex ?category=Electronics)
+    // new URLSearchParams(...) turns that ? string into an object you can easily ask for values from.
     const queryParams = new URLSearchParams(location.search);
     const categoryFromURL = decodeURIComponent(queryParams.get("category") || "");
 
@@ -33,17 +36,6 @@ export default function Shop() {
 
 
 
-  // const handleCategoryClick = (categoryName) => {
-  //   setSelectedCategory(categoryName);
-  //   if (categoryName === "All") {
-  //     setFilteredProducts(products);
-  //   } else {
-  //     const filtered = products.filter(
-  //       (p) => p.category_name === categoryName
-  //     );
-  //     setFilteredProducts(filtered);
-  //   }
-  // };
   // Apply filtering whenever selectedCategory or products change
   useEffect(() => {
     if (selectedCategory === "All") {
@@ -63,8 +55,7 @@ export default function Shop() {
 
 
   return (
-    // <div >
-    //    <NavBar />
+
       <div className="shop-content">
         {/* Sidebar */}
         
@@ -90,7 +81,7 @@ export default function Shop() {
                 />
                 <h3 className="product-name">{product.name}</h3>
                 <p className="product-price">${product.price}</p>
-                <button className="add-to-cart">Add to Cart</button>
+                <button className="add-to-cart" onClick={() => addToCart(product)} >Add</button>
               </div>
             ))}
           </div>
@@ -99,7 +90,6 @@ export default function Shop() {
         )}
       </main>
       </div>
-//       {/* <Footer/>
-// </div> */}
+
   );
 }
