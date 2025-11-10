@@ -36,8 +36,20 @@ export const CartProvider = ({ children }) => {
   // Clear all items
   const clearCart = () => setCart([]);
 
+  // quantity\
+  const updateQuantity = (productId, newQuantity) => {
+  setCart((prevCart) =>
+    prevCart.map((item) =>
+      item.product_id === productId
+        ? { ...item, quantity: Math.max(newQuantity, 1) } // prevent 0 or negative
+        : item
+    )
+  );
+};
+
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   );

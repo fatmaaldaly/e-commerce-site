@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import "../style.css";
 import { useCart } from "../context/CartContext";
 
 export default function Cart({ isOpen, onClose }) {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
+  const [quantity, setQuantity] = useState(0);
 
   return (
     <div className={`cart-sidebar ${isOpen ? "open" : ""}`}>
@@ -35,38 +36,38 @@ export default function Cart({ isOpen, onClose }) {
         //   ))}
         // </ul>
         <ul className="cart-items">
-  {cart.map((item) => (
-    <li key={item.product_id} className="cart-item">
-      <img
-        src={item.image_url}
-        alt={item.name}
-        className="cart-item-image"
-      />
+          {cart.map((item) => (
+            <li key={item.product_id} className="cart-item">
+              <img
+                src={item.image_url}
+                alt={item.name}
+                className="cart-item-image"
+              />
 
-      <div className="cart-item-details">
-        <h4>{item.name}</h4>
-        <p>${item.price}</p>
-      </div>
+              <div className="cart-item-details">
+                <h4>{item.name}</h4>
+                <p>${item.price}</p>
+              </div>
 
-      <div className="cart-item-quantity">
-        <button>-</button>
-        <span>{item.quantity}</span>
-        <button>+</button>
-      </div>
+              <div className="cart-item-quantity">
+                <button onClick={()=> updateQuantity(item.product_id, item.quantity - 1)}>-</button>
+                <span>{item.quantity}</span>
+                <button onClick={()=> updateQuantity(item.product_id, item.quantity + 1)}>+</button>
+              </div>
 
-      <div className="cart-item-price">
-        ${(item.price * item.quantity).toFixed(2)}
-      </div>
+              <div className="cart-item-price">
+                ${(item.price * item.quantity).toFixed(2)}
+              </div>
 
-      <button
-        className="remove-btn"
-        onClick={() => removeFromCart(item.product_id)}
-      >
-        ✕
-      </button>
-    </li>
-  ))}
-</ul>
+              <button
+                className="remove-btn"
+                onClick={() => removeFromCart(item.product_id)}
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+     </ul>
 
       )}
 
