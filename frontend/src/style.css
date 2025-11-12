@@ -272,10 +272,36 @@
 
 /* Hero Section */
 
-.hero-section{
+/* .hero-section{
   margin-top: 50px;
   width:100% ;
+} */
+
+/* Hero.css */
+
+.hero-section {
+  width: 100%;
+  height: 80vh;
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(194, 239, 234);
 }
+
+.hero-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  background-color: rgb(194, 239, 234);
+
+
+}
+
 
 
 
@@ -440,8 +466,8 @@
 
 .shop-content {
   display: flex;
-  /* min-height: calc(100vh - 160px); */
-  height: 100vh;
+  min-height: calc(100vh - 160px);
+  /* height: 100vh; */
   background-color: var(--bg-color);;
   padding: 50px;
   padding-bottom: 100px;
@@ -466,6 +492,7 @@
 .category-list-container {
   display: flex;
   flex-direction: column;
+
  
 }
 

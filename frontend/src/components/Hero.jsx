@@ -1,45 +1,28 @@
-// import react from 'react';
-// import Cookies from '../assets/cookies.png';
-// import 'animate.css';
-// import AOS from 'aos';
-// import 'aos/dist/aos.css';
-// import { useEffect } from 'react';
-
-// export default function Hero(){
-
-
-//     return(
-
-//     <div className="hero-container">
-       
-//         </div>
-
-//     );
-// }
-
-
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import offers from "../assets/offers.png"
+import heroimg from "../assets/heroimg.png";
+
+
 
 const HERO_IMAGES = [
   {
     src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2321/desktop/big/desktop-en.jpg?1754308080",
     alt: "Imported Grocery",
   },
-//   {
-//     src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2606/desktop/big/gift-card-desktop-en.jpg?1750601060",
-//     alt: "Exclusive Offers",
-//   },
-//   {
-//     src: "",
-//     alt: "Best Deals",
-//   },
+  // {
+  //   src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2606/desktop/big/gift-card-desktop-en.jpg?1750601060",
+  //   alt: "Exclusive Offers",
+  // },
+  {
+    src: heroimg,
+    alt: "Best Deals",
+  },
 ];
+
 
 export default function Hero() {
   return (
