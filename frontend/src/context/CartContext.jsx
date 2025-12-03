@@ -12,7 +12,7 @@ export const CartProvider = ({ children }) => {
 
   // Add item to cart
   const addToCart = (product) => {
-    console.log("Adding product:", product);
+    // console.log("Adding product:", product);
     setCart((prevCart) => {
       // check if product already in cart
       const existingItem = prevCart.find((item) => item.product_id === product.product_id);
@@ -41,7 +41,7 @@ export const CartProvider = ({ children }) => {
   setCart((prevCart) =>
     prevCart.map((item) =>
       item.product_id === productId
-        ? { ...item, quantity: Math.max(newQuantity, 1) } // prevent 0 or negative
+        ? { ...item, quantity: Math.max(newQuantity, 0) } 
         : item
     )
   );

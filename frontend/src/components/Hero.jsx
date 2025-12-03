@@ -5,22 +5,23 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import heroimg from "../assets/heroimg.png";
-
+import heroimg1 from "../assets/heroimg1.png";
 
 
 const HERO_IMAGES = [
+  // https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2321/desktop/big/desktop-en.jpg?1754308080
   {
-    src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2321/desktop/big/desktop-en.jpg?1754308080",
+    src: heroimg1 ,
     alt: "Imported Grocery",
   },
   // {
   //   src: "https://d1c124wpoew66.cloudfront.net//spree/content/web_banners/2606/desktop/big/gift-card-desktop-en.jpg?1750601060",
   //   alt: "Exclusive Offers",
   // },
-  {
-    src: heroimg,
-    alt: "Best Deals",
-  },
+  // {
+  //   src: heroimg,
+  //   alt: "Best Deals",
+  // },
 ];
 
 

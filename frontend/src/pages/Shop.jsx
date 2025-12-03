@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import CategoryList from "../components/CategoryList";
 import { useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import ProductCard from "../components/ProductCard";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+
 
 export default function Shop() {
   const [products, setProducts] = useState([]); 
@@ -10,11 +14,9 @@ export default function Shop() {
   const location = useLocation();
   const { addToCart } = useCart();
 
-  // Read the category from URL query parameter
-  // Run the code inside every time the URL/location changes.
+
+  // Read the category from URL query parameter, Runs every time the URL changes
   useEffect(() => {
-    // gives the part of the URL after ? (for ex ?category=Electronics)
-    // new URLSearchParams(...) turns that ? string into an object you can easily ask for values from.
     const queryParams = new URLSearchParams(location.search);
     const categoryFromURL = decodeURIComponent(queryParams.get("category") || "");
 
@@ -22,6 +24,7 @@ export default function Shop() {
       setSelectedCategory(categoryFromURL);
     }
   }, [location]);
+
 
   // Fetch products
   useEffect(() => {
@@ -35,8 +38,7 @@ export default function Shop() {
   }, []);
 
 
-
-  // Apply filtering whenever selectedCategory or products change
+  // Apply filtering whenever selectedCategory change
   useEffect(() => {
     if (selectedCategory === "All") {
       setFilteredProducts(products);
@@ -48,17 +50,19 @@ export default function Shop() {
     }
   }, [selectedCategory, products]);
 
-  // Handle sidebar category click
+
+  // Updates the selected category when you click a button in the sidebar
   const handleCategoryClick = (categoryName) => {
     setSelectedCategory(categoryName);
   };
 
 
   return (
-
+    <>
+     <NavBar />
       <div className="shop-content">
+         
         {/* Sidebar */}
-        
         <aside className="shop-sidebar">
           
           <CategoryList
@@ -68,28 +72,10 @@ export default function Shop() {
         </aside>
 
         {/* Product Grid */}
-      <main className="shop-products">
-        {filteredProducts.length > 0 ? (
-          <div className="product-grid">
-            {filteredProducts.map((product) => (
-              <div key={product.product_id} className="product-card">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="product-image"
-                  
-                />
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">${product.price}</p>
-                <button className="add-to-cart" onClick={() => addToCart(product)} >Add</button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="no-products">No products found.</p>
-        )}
-      </main>
+        <ProductCard products={filteredProducts} addToCart={addToCart} />
+     
       </div>
-
+         <Footer />
+   </>
   );
 }

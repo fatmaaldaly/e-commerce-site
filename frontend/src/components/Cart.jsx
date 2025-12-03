@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import "../style.css";
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Cart({ isOpen, onClose }) {
+
+
+export default function Cart({isOpen, onClose}) {
   const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
-  const [quantity, setQuantity] = useState(0);
+  
 
+  const navigate = useNavigate();
+
+
+  
   return (
     <div className={`cart-sidebar ${isOpen ? "open" : ""}`}>
       <button className="close-cart-btn" onClick={onClose}>
@@ -17,24 +24,7 @@ export default function Cart({ isOpen, onClose }) {
       {cart.length === 0 ? (
         <p className="empty-cart">Your cart is empty</p>
       ) : (
-        // <ul className="cart-items">
-        //   {cart.map((item) => (
-        //     <li key={item.product_id} className="cart-item">
-        //       <div>
-        //         <p className="cart-item-name">{item.name}</p>
-        //         <p className="cart-item-details">
-        //           {item.quantity} × ${item.price}
-        //         </p>
-        //       </div>
-        //       <button
-        //         className="remove-btn"
-        //         onClick={() => removeFromCart(item.id)}
-        //       >
-        //         🗑️
-        //       </button>
-        //     </li>
-        //   ))}
-        // </ul>
+
         <ul className="cart-items">
           {cart.map((item) => (
             <li key={item.product_id} className="cart-item">
@@ -46,7 +36,7 @@ export default function Cart({ isOpen, onClose }) {
 
               <div className="cart-item-details">
                 <h4>{item.name}</h4>
-                <p>${item.price}</p>
+                <p>EGP{item.price}</p>
               </div>
 
               <div className="cart-item-quantity">
@@ -72,25 +62,23 @@ export default function Cart({ isOpen, onClose }) {
       )}
 
 
-      {/* {cart.length > 0 && (
-        <>
-          <div className="cart-total">
-            <span>Subtotal:</span>
-            <span className="total-amount">${cartTotal.toFixed(2)}</span>
-          </div>
-          <button className="checkout-btn">Proceed to Checkout</button>
-          <button className="clear-cart-btn" onClick={clearCart}>
-            Clear Cart
-          </button>
-        </>
-      )} */}
-
       {cart.length > 0 && (
+         <>
+        <button
+          className="checkout-btn"
+          onClick={() => navigate("/checkout", { state: { cart } })}
+        >
+          Proceed to Checkout
+        </button>
 
         <button className="clear-cart-btn" onClick={clearCart}>
           Clear Cart
         </button>
+         </>
       )}
+      
     </div>
+
+   
   );
 }

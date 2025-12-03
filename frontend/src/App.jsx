@@ -7,20 +7,23 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import { CartProvider } from "./context/CartContext";
+import Checkout from "./pages/Checkout";
+
 
 function App() {
   return (
       <CartProvider>
         <BrowserRouter>
         <ScrollToTop /> 
-          <NavBar />
+          {/* <NavBar /> */}
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/checkout" element={<Checkout />} />
           </Routes>
-          <Footer />
+          {/* <Footer /> */}
         </BrowserRouter>
       </CartProvider>
   );
