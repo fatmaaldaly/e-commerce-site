@@ -27,7 +27,6 @@ export default function Category({ onCategoryClick, selectedCategory }) {
         {categories.map((cat) => (
           <div
             key={cat.category_id}
-            // className="category-card border rounded-2xl shadow-sm hover:shadow-md transition-all p-2 text-center"
             className={`category-card ${selectedCategory === cat.name ? "active" : ""}`}
             onClick={() => handleCategoryClick(cat.name)} 
           >

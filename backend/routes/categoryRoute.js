@@ -14,6 +14,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+
 // Get products in a specific category
 router.get("/:id/products", async (req, res) => {
   try {

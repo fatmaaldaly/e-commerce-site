@@ -1,12 +1,11 @@
-import bcrypt from "bcrypt"; // hash password
-import jwt from "jsonwebtoken"; // create token for loged in user
+import bcrypt from "bcrypt"; 
+import jwt from "jsonwebtoken"; 
 import express from "express";
 import pool from "../index.js"; 
 import dotenv from "dotenv";
+
+
 dotenv.config();
-
-
-
 
 const router = express.Router();
 
@@ -14,8 +13,7 @@ const router = express.Router();
 
 // Register 
 router.post("/register", async (req, res) => {
-  console.log("Request body:", req.body);
-
+  
   // destrucutre the req.body json format from the frontend to access every element separately
   const { fullName, email, password} = req.body;
 
@@ -32,18 +30,35 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
 
-    await pool.query(
-      "INSERT INTO users (fullName, email, password) VALUES ($1, $2, $3)",
-      [fullName, email, hashedPassword]
+   const newUser = await pool.query(
+  "INSERT INTO users (fullName, email, password) VALUES ($1, $2, $3) RETURNING user_id",
+  [fullName, email, hashedPassword]
+  );
+
+  const userId = newUser.rows[0].user_id;
+
+
+   // Generate token
+    const token = jwt.sign(
+      { user_id: userId, email },
+      process.env.JWT_SECRET,
+      { expiresIn: "5h" }
     );
 
-    res.json({ message: "User registered successfully" });
+    res.json({
+      message: "User registered successfully",
+      token,
+      user: { id: userId, fullName, email }
+    });
   
    // If something fails (like a database error), it logs it in your terminal and tells the frontend something went wrong 
   } catch (err) {
     console.error("Error during registration:", err);
     res.status(500).json({ error: "Server error during registration" });
   }
+
+
+
 
 });
 
@@ -75,21 +90,24 @@ router.post("/login", async (req, res) => {
     // generate JWT token (keep in .env), this token will be sent to the frontend, stored in localStorage, 
     // and used to access protected routes later like products/profile
     const token = jwt.sign(
-      { id: user.id, email: user.email}, // payload
-      process.env.JWT_SECRET, // secret key
-      { expiresIn: "1h" } // how long the token is valid for
+      {user_id: user.user_id, email: user.email}, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "5h" } 
     );
+    
 
     // send back response
     res.json({
       message: "Login successful",
       token,
       user: {
-        id: user.id,
+        id: user.user_id,
         fullName: user.fullName,
         email: user.email,
       },
     });
+    
+
   } catch (err) {
     console.error("Error during login:", err);
     res.status(500).json({ error: "Server error during login" });

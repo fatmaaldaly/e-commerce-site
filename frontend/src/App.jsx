@@ -3,15 +3,17 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Shop from "./pages/Shop";
-import NavBar from "./components/NavBar";
-import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import { CartProvider } from "./context/CartContext";
 import Checkout from "./pages/Checkout";
+import { AuthProvider } from "./context/AuthContext";
+import Success from "./pages/Success";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 
 function App() {
   return (
+    <AuthProvider>
       <CartProvider>
         <BrowserRouter>
         <ScrollToTop /> 
@@ -21,11 +23,15 @@ function App() {
             <Route path="/shop" element={<Shop />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout" element={<ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute> }/>
+            <Route path="/success" element={<Success />} />
           </Routes>
           {/* <Footer /> */}
         </BrowserRouter>
       </CartProvider>
+      </AuthProvider>
   );
 }
 

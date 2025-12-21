@@ -2,14 +2,24 @@ import React, { useState } from "react";
 import "../style.css";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
-
+ import { useAuth } from "../context/AuthContext";
 
 
 export default function Cart({isOpen, onClose}) {
   const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
-  
-
   const navigate = useNavigate();
+  const { token } = useAuth(); 
+
+// const handleCheckoutClick = () => {
+//   if (!token) {
+//     localStorage.setItem("redirect_after_login", "/checkout");
+//     navigate("/login");
+//   } else {
+//     navigate("/checkout");
+//   }
+// };
+
+
 
 
   
@@ -66,7 +76,7 @@ export default function Cart({isOpen, onClose}) {
          <>
         <button
           className="checkout-btn"
-          onClick={() => navigate("/checkout", { state: { cart } })}
+          onClick={() => navigate("/checkout")}
         >
           Proceed to Checkout
         </button>

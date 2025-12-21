@@ -80,12 +80,12 @@ export default function NavBar() {
 
        <div className={`nav-menu ${isMenuOpen ? "open" : ""}`}>
 
-          <button
+          {/* <button
             className="absolute top-4 right-4 text-white"
             onClick={() => setIsMenuOpen(false)}
           >
             ✕
-          </button>
+          </button> */}
 
           {navigation.map((item) => (
             <Link

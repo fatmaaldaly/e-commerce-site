@@ -9,102 +9,56 @@ export default function ProductCard({ products = [] }) {
   const [hoveredId, setHoveredId] = useState(null);
 
 
-  // useEffect(() => {
-  //   const map = {};
-  //   list.forEach((p) => {
-  //     const inCart = cart.find((i) => i.product_id === p.product_id);
-  //     map[p.product_id] = inCart?.quantity ?? 1;
-  //   });
-  //   setQtyMap(map);
-  // }, [list, cart]);
   useEffect(() => {
   const map = {};
   list.forEach((p) => {
     const inCart = cart.find((i) => i.product_id === p.product_id);
-    map[p.product_id] = inCart?.quantity ?? 0; // ← start at 0
+    map[p.product_id] = inCart?.quantity ?? 0; 
   });
   setQtyMap(map);
-}, [list, cart]);
+ }, [list, cart]);
 
 
-  // const changeQty = (productId, delta) => {
-  //   setQtyMap((prev) => {
-  //     const prevQ = prev[productId] ?? 1;
-  //     const nextQ = Math.max(1, prevQ + delta);
-  //     const next = { ...prev, [productId]: nextQ };
 
-  //     const inCart = cart.find((i) => i.product_id === productId);
-  //     const product = list.find((p) => p.product_id === productId);
+const changeQty = (productId, delta) => {
+  const prevQ = qtyMap[productId] ?? 0;
+  const nextQ = Math.max(0, prevQ + delta);
 
-  //   if (inCart) {
-  //     updateQuantity(productId, nextQ);
-  //   } else if (product) {
-  //     addToCart(product, nextQ);
+  // 1️⃣ Update local UI state only
+  setQtyMap((prev) => ({
+    ...prev,
+    [productId]: nextQ,
+  }));
 
-  //     // KEY FIX — instantly update qtyMap
-  //     next[productId] = nextQ;
-  //   }
+  // 2️⃣ Update global cart state AFTER
+  const inCart = cart.find((i) => i.product_id === productId);
+  const product = list.find((p) => p.product_id === productId);
 
-  //     return next;
-  //   });
-  // };
-
-
-  const changeQty = (productId, delta) => {
-  setQtyMap((prev) => {
-    const prevQ = prev[productId] ?? 0;
-    const nextQ = Math.max(0, prevQ + delta); // allow 0
-
-    const next = { ...prev, [productId]: nextQ };
-
-    const inCart = cart.find((i) => i.product_id === productId);
-    const product = list.find((p) => p.product_id === productId);
-
-    if (inCart) {
-      // If quantity becomes 0, remove from cart
-      if (nextQ === 0) {
-        updateQuantity(productId, 0); // Your context should remove if qty=0
-      } else {
-        updateQuantity(productId, nextQ);
-      }
-    } else if (product && nextQ > 0) {
-      // Add to cart only if qty > 0
-      addToCart(product, nextQ);
+  if (inCart) {
+    if (nextQ === 0) {
+      updateQuantity(productId, 0);
+    } else {
+      updateQuantity(productId, nextQ);
     }
-
-    return next;
-  });
+  } else if (product && nextQ > 0) {
+    addToCart(product);
+  }
 };
 
 
-  // const handleAdd = (productId) => {
-  //   const qty = qtyMap[productId] ?? 1;
-  //   const product = list.find((p) => p.product_id === productId);
-  //   if (product){ 
-  //     addToCart(product, qty);
-  //     setQtyMap((prev) => ({
-  //       ...prev,
-  //       [productId]: qty,
-  //     }));
-  // }
-  // };
 
-
-  const handleAdd = (productId) => {
-  const qty = qtyMap[productId] ?? 0;
+const handleAdd = (productId) => {
   const product = list.find((p) => p.product_id === productId);
-
   if (!product) return;
 
-  const finalQty = qty === 0 ? 1 : qty; // ← auto set 1 if still 0
-
-  addToCart(product, finalQty);
+  addToCart(product);
 
   setQtyMap((prev) => ({
     ...prev,
-    [productId]: finalQty,
+    [productId]: (prev[productId] ?? 0) + 1,
   }));
 };
+
 
 
   return (
@@ -135,7 +89,8 @@ export default function ProductCard({ products = [] }) {
                   >
                     -
                   </button>
-                  <span className="qty-value">{qtyMap[product.product_id] ?? 1}</span>
+                  <span className="qty-value">{qtyMap[product.product_id] ?? 0}</span>
+
                   <button
                     className="qty-btn"
                     onClick={() => changeQty(product.product_id, 1)}

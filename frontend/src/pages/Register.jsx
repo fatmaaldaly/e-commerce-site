@@ -1,6 +1,6 @@
 import {useState} from "react";
-import { Link, useNavigate } from 'react-router-dom'
-import NavBar from "../components/NavBar";
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from "../context/AuthContext";
 
 
 export default function Register(){
@@ -9,42 +9,28 @@ export default function Register(){
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { register } = useAuth();
+    const location = useLocation();
 
-    const handleRegister = async (e) => {
-    e.preventDefault();
 
+    
+  const from = location.state?.from?.pathname || "/checkout";
+
+  const handleRegister = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/register", {
-        method: "POST",
-        // tells the backend the data im sending is in json format, So the backend knows it should parse the request body as JSON, not as plain text
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await register(fullName, email, password);
 
-        
-        // converts a JavaScript object to a json string, sends data in this format to backend
-        body: JSON.stringify({
-          fullName: fullName,  
-          email: email,
-          password: password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Registration failed");
+      if (res.token) {
+        navigate(from, { replace: true }); 
+      } else {
+        setError(res.error || "Registration failed");
       }
-
-      localStorage.setItem("token", data.token); 
-      navigate("/");
-      setError("");
-
     } catch (err) {
-      console.error("Registration error:", err);
-      setError(err.message || "Something went wrong");
+      setError("Something went wrong");
     }
   };
+   
+   
 
 
 

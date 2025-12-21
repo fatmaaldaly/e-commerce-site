@@ -1,0 +1,167 @@
+/* Auth.css */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #101010;
+}
+
+.auth-card {
+  background-color: #292b29;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.tab-toggle {
+  display: flex;
+  margin-bottom: 20px;
+  background-color: #454745;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tab-toggle .tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  border: none;
+  outline: none;
+}
+
+.tab-toggle .tab.active {
+  background-color: rgb(231, 209, 71);
+  color: #000;
+}
+
+.form-container {
+  position: relative;
+ 
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+}
+
+.form h2 {
+  text-align: center;
+  color: #fff;
+}
+
+.form input {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  color: #ffffff;
+}
+
+.submit-btn {
+  padding: 12px;
+  border-radius: 6px;
+  background-color: rgb(231, 209, 71);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+
+}
+
+.submit-btn:hover {
+  background-color: rgb(231, 211, 79);
+}
+
+/* Slide animation */
+.slide-in {
+  animation: slideIn 0.4s ease forwards;
+}
+
+.slide-out {
+  animation: slideIn 0.4s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.social-login {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center; /* centers both buttons */
+  gap: 10px; /* space between buttons */
+}
+
+.google-btn, .facebook-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* space between icon and text */
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+.google-btn {
+  background-color: #737477;
+  color: white;
+}
+
+.facebook-btn {
+  background-color: #737477;
+  color: white;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.continue-with {
+  text-align: center;
+  color: #ccc;
+  margin-top: 15px;
+  font-size: 14px;
+
+}
+
+.back-button{
+  position: absolute;
+  top: 50px;
+  left: 30px;
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+.back-button:hover {
+  color: rgb(231, 211, 79);
+}
