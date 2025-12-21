@@ -6,9 +6,7 @@ import dotenv from "dotenv";
 
 
 dotenv.config();
-
 const router = express.Router();
-
 
 
 // Register 
@@ -27,16 +25,13 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-
-   const newUser = await pool.query(
+  // CRUD: create new user
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await pool.query(
   "INSERT INTO users (fullName, email, password) VALUES ($1, $2, $3) RETURNING user_id",
   [fullName, email, hashedPassword]
   );
-
   const userId = newUser.rows[0].user_id;
-
 
    // Generate token
     const token = jwt.sign(
@@ -56,8 +51,6 @@ router.post("/register", async (req, res) => {
     console.error("Error during registration:", err);
     res.status(500).json({ error: "Server error during registration" });
   }
-
-
 
 
 });
