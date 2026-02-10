@@ -18,7 +18,11 @@ export default function NavBar() {
    const [isMenuOpen, setIsMenuOpen] = useState(false);
    const [isCartOpen, setIsCartOpen] = useState(false);
    const { cart } = useCart();
-  
+
+   const totalItems = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   return (
     
@@ -39,29 +43,29 @@ export default function NavBar() {
 
         {/* Centered Logo */}
         <div className="logo-container">
+          <Link to="/">
           <img
             alt="Logo"
             src={logo}
             style={{ width: "200px" }}
           />
+          </Link>
         </div>
 
 
         {/* cart & login */}
         <div className="flex absolute right-6 gap-4">
-          <div className="cursor-pointer" onClick={() => setIsCartOpen(!isCartOpen)}>
-            
-            {/* {cart.length} */}
-           <svg className="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bag logo"  style={{color: 'rgb(231, 209, 71)'}} viewBox="0 0 16 16">  
+          <div className="relative cursor-pointer" onClick={() => setIsCartOpen(!isCartOpen)}>
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bag logo"  style={{color: 'rgb(231, 209, 71)'}} viewBox="0 0 16 16">  
            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
            </svg>
-             {/* Small badge showing cart count */}
-              {/* {cart.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-pink-600 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-                  {cart.length}
-                </span>
-              )} */}
-          
+
+
+           {totalItems > 0 && (
+              <span className="cart-badge">
+                {totalItems}
+              </span>
+            )}
           </div>
          
          <Link to="/Login">
@@ -79,13 +83,6 @@ export default function NavBar() {
 
 
        <div className={`nav-menu ${isMenuOpen ? "open" : ""}`}>
-
-          {/* <button
-            className="absolute top-4 right-4 text-white"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            ✕
-          </button> */}
 
           {navigation.map((item) => (
             <Link

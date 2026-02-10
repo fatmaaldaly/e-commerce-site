@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import express from "express";
 import pool from "../index.js"; 
 import dotenv from "dotenv";
+import { validateRegister, validateLogin } from "../middleware/authValidationMiddleware.js";
 
 
 dotenv.config();
@@ -10,14 +11,11 @@ const router = express.Router();
 
 
 // Register 
-router.post("/register", async (req, res) => {
+router.post("/register", validateRegister, async (req, res) => {
   
   // destrucutre the req.body json format from the frontend to access every element separately
   const { fullName, email, password} = req.body;
 
-  if (!fullName || !email || !password) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
 
   try {
     const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -25,13 +23,13 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
-  // CRUD: create new user
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await pool.query(
-  "INSERT INTO users (fullName, email, password) VALUES ($1, $2, $3) RETURNING user_id",
-  [fullName, email, hashedPassword]
-  );
-  const userId = newUser.rows[0].user_id;
+    // CRUD: create new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await pool.query(
+    "INSERT INTO users (fullName, email, password) VALUES ($1, $2, $3) RETURNING user_id",
+    [fullName, email, hashedPassword]
+    );
+    const userId = newUser.rows[0].user_id;
 
    // Generate token
     const token = jwt.sign(
@@ -59,12 +57,9 @@ router.post("/register", async (req, res) => {
 
 
 // Login 
-router.post("/login", async (req, res) => {
+router.post("/login", validateLogin, async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required" });
-  }
 
   try {
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);

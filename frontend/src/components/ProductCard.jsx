@@ -24,13 +24,13 @@ const changeQty = (productId, delta) => {
   const prevQ = qtyMap[productId] ?? 0;
   const nextQ = Math.max(0, prevQ + delta);
 
-  // 1️⃣ Update local UI state only
+  // Update local UI state only
   setQtyMap((prev) => ({
     ...prev,
     [productId]: nextQ,
   }));
 
-  // 2️⃣ Update global cart state AFTER
+  // Update global cart state AFTER
   const inCart = cart.find((i) => i.product_id === productId);
   const product = list.find((p) => p.product_id === productId);
 

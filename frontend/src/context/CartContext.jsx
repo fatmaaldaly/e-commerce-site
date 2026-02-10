@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
@@ -6,30 +6,18 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const { token, authFetch } = useAuth();
+  const [cart, setCart] = useState([]);
 
-  /* =========================
-     STATE (guest-first)
-  ========================== */
-  const [cart, setCart] = useState(() => {
-    const stored = localStorage.getItem("guest_cart");
-    return stored ? JSON.parse(stored) : [];
-  });
-
-  /* =========================
-     PERSIST GUEST CART
-  ========================== */
+  // Fetch cart when user logs in / refreshes
   useEffect(() => {
-    if (!token) {
-      localStorage.setItem("guest_cart", JSON.stringify(cart));
+    if (token) {
+      fetchServerCart();
+    } else {
+      setCart([]);
     }
-  }, [cart, token]);
+  }, [token]);
 
-  /* =========================
-     FETCH USER CART
-  ========================== */
-  const fetchServerCart = useCallback(async () => {
-    if (!token) return;
-
+  const fetchServerCart = async () => {
     try {
       const res = await authFetch("http://localhost:5000/api/cart");
       const data = await res.json();
@@ -37,105 +25,39 @@ export const CartProvider = ({ children }) => {
     } catch {
       setCart([]);
     }
-  }, [token, authFetch]);
+  };
 
-  /* =========================
-     SYNC GUEST CART ON LOGIN
-  ========================== */
-  useEffect(() => {
-    if (!token) return;
 
-    const syncGuestCart = async () => {
-      const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
-
-      for (const item of guestCart) {
-        try {
-          await authFetch("http://localhost:5000/api/cart/add", {
-            method: "POST",
-            body: JSON.stringify({
-              product_id: item.product_id,
-              quantity: item.quantity,
-            }),
-          });
-        } catch {
-          return;
-        }
-      }
-
-      localStorage.removeItem("guest_cart");
-      fetchServerCart();
-    };
-
-    syncGuestCart();
-  }, [token, fetchServerCart, authFetch]);
-
-  /* =========================
-     ADD TO CART
-  ========================== */
-  const addToCart = (product) => {
-    // Always update UI first
-    setCart((prev) => {
-      const existing = prev.find((i) => i.product_id === product.product_id);
-      if (existing) {
-        return prev.map((i) =>
-          i.product_id === product.product_id
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
+  // Add to cart
+  const addToCart = async (product) => {
+    await authFetch("http://localhost:5000/api/cart/add", {
+      method: "POST",
+      body: JSON.stringify({ product_id: product.product_id, quantity: 1 }),
     });
 
-    if (!token) return;
-
-    authFetch("http://localhost:5000/api/cart/add", {
-      method: "POST",
-      body: JSON.stringify({
-        product_id: product.product_id,
-        quantity: 1,
-      }),
-    }).catch(() => {});
+    fetchServerCart();
   };
 
-  /* =========================
-     UPDATE QUANTITY (POST /update)
-  ========================== */
-  const updateQuantity = (product_id, quantity) => {
-    if (quantity < 1) {
-      removeFromCart(product_id);
-      return;
-    }
 
-    setCart((prev) =>
-      prev.map((i) =>
-        i.product_id === product_id ? { ...i, quantity } : i
-      )
-    );
-
-    if (!token) return;
-
-    authFetch("http://localhost:5000/api/cart/update", {
+  // Update quantity
+  const updateQuantity = async (product_id, quantity) => {
+    await authFetch("http://localhost:5000/api/cart/update", {
       method: "POST",
       body: JSON.stringify({ product_id, quantity }),
-    }).catch(() => {});
+    });
+
+    fetchServerCart();
   };
 
-  /* =========================
-     REMOVE FROM CART (LOCAL ONLY)
-  ========================== */
-  const removeFromCart = (product_id) => {
-    setCart((prev) => prev.filter((i) => i.product_id !== product_id));
 
-    // Backend has no remove route → handled implicitly by update logic
-  };
+  // Remove item (quantity → 0 pattern)
+  const removeFromCart = async (product_id) => {
+    await authFetch("http://localhost:5000/api/cart/update", {
+      method: "POST",
+      body: JSON.stringify({ product_id, quantity: 0 }),
+    });
 
-  /* =========================
-     CLEAR CART
-  ========================== */
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem("guest_cart");
-    // Backend has no clear route
+    fetchServerCart();
   };
 
   return (
@@ -145,7 +67,6 @@ export const CartProvider = ({ children }) => {
         addToCart,
         updateQuantity,
         removeFromCart,
-        clearCart,
         fetchServerCart,
       }}
     >

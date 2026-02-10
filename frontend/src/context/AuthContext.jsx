@@ -4,11 +4,13 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  // const API = "http://localhost:5000/api";
+ 
 
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [userId, setUserId] = useState(() => localStorage.getItem("user_id"));
-
+  const [redirectTo, setRedirectTo] = useState(null);
+  
+  
   // Save auth data
   const saveAuthData = (token, user_id) => {
     setToken(token);
@@ -23,28 +25,9 @@ export const AuthProvider = ({ children }) => {
     setUserId(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user_id");
+    setRedirectTo(null);
   };
 
-  // Validate token on load / change
-  // useEffect(() => {
-  //   if (!token) return;
-
-  //   const validateToken = async () => {
-  //     try {
-  //       const res = await fetch("http://localhost:5000/api/auth/register", {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-
-  //       if (!res.ok) logout();
-  //     } catch {
-  //       logout();
-  //     }
-  //   };
-
-  //   validateToken();
-  // }, [token]);
 
   // Login
   const login = async (email, password) => {
@@ -63,6 +46,7 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+
   // Register
   const register = async (fullName, email, password) => {
     const res = await fetch("http://localhost:5000/api/auth/register", {
@@ -79,6 +63,7 @@ export const AuthProvider = ({ children }) => {
 
     return data;
   };
+
 
   // Authenticated fetch
   const authFetch = async (url, options = {}) => {
@@ -101,9 +86,11 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+
+
   return (
     <AuthContext.Provider
-      value={{ token, userId, login, register, logout, authFetch }}
+      value={{ token, userId, login, register, logout, authFetch, redirectTo, setRedirectTo}}
     >
       {children}
     </AuthContext.Provider>

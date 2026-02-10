@@ -31,15 +31,6 @@ export default function Shop() {
 
 
   // Fetch products
-  // useEffect(() => {
-  //   fetch("http://localhost:5000/api/products")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setProducts(data);
-  //       setFilteredProducts(data); 
-  //     })
-  //     .catch((err) => console.error("Error fetching products:", err));
-  // }, []);
     useEffect(() => {
     fetch(`http://localhost:5000/api/products?page=${page}&limit=${limit}`)
       .then((res) => res.json())

@@ -1,83 +1,17 @@
-// import { data, Link, useNavigate, useLocation } from "react-router-dom";
-// import React, { useEffect, useState } from "react";
-// import { useAuth } from "../context/AuthContext";
-
-
-// export default function Login() {  
-//     const [email, setEmail] = useState("");
-//     const [password, setPassword] = useState("");
-//     const [error, setError] = useState("");
-//     const { login } = useAuth();
-//     const navigate = useNavigate(); 
-//     const location = useLocation();
-
-  
-//   const from = location.state?.from?.pathname || "/checkout";
-
-//   const handleLogin = async () => {
-//     try {
-//       const res = await login(email, password);
-
-//       if (res.token) {
-//         navigate(from, { replace: true }); 
-//       } else {
-//         setError(res.error || "Login failed");
-//       }
-//     } catch (err) {
-//       setError("Something went wrong");
-//     }
-//   };
-
-
-
-
-
-//     return (
-
-//       <>
-
-//       <div className="login-register">
-//         <button></button>
-//       </div>
-   
-//         <div className="login-container">
-            
-//             <div className="login-content">
-//             <h2 className="login-title">Login</h2>
-//             {error && <p style={{ color: "red" }}>{error}</p>}
-//             <input type="text" 
-//               placeholder="Email" 
-//               className="login-input" 
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)} required>
-//             </input>
-            
-//             <input 
-//               type="password" 
-//               placeholder="Password" 
-//               className="login-input" 
-//               value={password}
-//               onChange={(e) => setPassword(e.target.value)} required>
-//             </input>
-            
-//             <p>Forgot password?</p>
-//             <p>Don't have an account?<Link to="/Register" className="register-link">Register</Link></p>
-           
-//             <button onClick={handleLogin} className="login-btn">Login</button>
-//         </div> 
-//         </div>
-//     </>
-
-
-
-//   );
-// }
-
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "../auth.css"; // Make sure to create this CSS file
 
 export default function AuthCard() {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, register, setRedirectTo } = useAuth();
 
   const handleGoogleLogin = () => {
     // Placeholder for Google OAuth logic
@@ -89,6 +23,38 @@ export default function AuthCard() {
     console.log("Facebook login clicked");
   };
 
+  const handleLogin = async () => {
+    try {
+      setError("");
+      const res = await login(email, password);
+      
+      if (res.token) {
+        const redirectPath = location.state?.from === "checkout" ? "/checkout" : "/";
+        navigate(redirectPath, { replace: true });
+      } else {
+        setError(res.error || "Login failed");
+      }
+    } catch (err) {
+      setError("Something went wrong");
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      setError("");
+      const res = await register(fullName, email, password);
+      
+      if (res.token) {
+        const redirectPath = location.state?.from === "checkout" ? "/checkout" : "/";
+        navigate(redirectPath, { replace: true });
+      } else {
+        setError(res.error || "Registration failed");
+      }
+    } catch (err) {
+      setError("Something went wrong");
+    }
+  };
+  
   return (
     <div className="auth-page">
       <button className="back-button" onClick={() => window.history.back()}>
@@ -100,6 +66,7 @@ export default function AuthCard() {
           <button
             className={`tab ${isLogin ? "active" : ""}`}
             onClick={() => setIsLogin(true)}
+            
           >
             Sign In
           </button>
@@ -116,9 +83,20 @@ export default function AuthCard() {
           {isLogin ? (
             <div className="form">
               <h2>Welcome Back</h2>
-              <input type="email" placeholder="Email Address" />
-              <input type="password" placeholder="Password" />
-              <button className="submit-btn">Sign In</button>
+              {error && <p style={{ color: "red" }}>{error}</p>}
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input 
+                type="password" 
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button className="submit-btn" onClick={handleLogin}>Sign In</button>
 
               {/* Social login buttons */}
               <p className="continue-with">or continue with</p>
@@ -136,10 +114,26 @@ export default function AuthCard() {
           ) : (
             <div className="form">
               <h2>Create Account</h2>
-              <input type="text" placeholder="Full Name" />
-              <input type="email" placeholder="Email Address" />
-              <input type="password" placeholder="Password" />
-              <button className="submit-btn">Register</button>
+              {error && <p style={{ color: "red" }}>{error}</p>}
+              <input 
+                type="text" 
+                placeholder="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+              <input 
+                type="email" 
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input 
+                type="password" 
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button className="submit-btn" onClick={handleRegister}>Register</button>
 
               {/* Social login buttons */}
               <p className="continue-with">or continue with</p>

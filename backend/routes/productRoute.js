@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
       LIMIT $1 OFFSET $2
     `, [limit, offset]);
 
-    // res.json(result.rows);
+
     // Response
     res.json({
       total: totalProducts,
@@ -44,21 +44,22 @@ router.get("/", async (req, res) => {
   }
 });
 
+
 // Get a single product by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query(
-      "SELECT * FROM products WHERE product_id = $1",
-      [id]
-    );
-    if (result.rows.length === 0)
-      return res.status(404).json({ message: "Product not found" });
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error fetching product" });
-  }
-});
+// router.get("/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const result = await pool.query(
+//       "SELECT * FROM products WHERE product_id = $1",
+//       [id]
+//     );
+//     if (result.rows.length === 0)
+//       return res.status(404).json({ message: "Product not found" });
+//     res.json(result.rows[0]);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Error fetching product" });
+//   }
+// });
 
 export default router;
