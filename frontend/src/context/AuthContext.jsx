@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
 
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [userId, setUserId] = useState(() => localStorage.getItem("user_id"));
-  const [redirectTo, setRedirectTo] = useState(null);
   
   
   // Save auth data
@@ -17,15 +16,6 @@ export const AuthProvider = ({ children }) => {
     setUserId(user_id);
     localStorage.setItem("token", token);
     localStorage.setItem("user_id", user_id);
-  };
-
-  // Logout
-  const logout = () => {
-    setToken(null);
-    setUserId(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user_id");
-    setRedirectTo(null);
   };
 
 
@@ -41,7 +31,27 @@ export const AuthProvider = ({ children }) => {
 
     if (data.token) {
       saveAuthData(data.token, data.user.id);
+    
+    // MERGE GUEST CART
+    const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
+
+    for (const item of guestCart) {
+      await fetch("http://localhost:5000/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.token}`,
+        },
+        body: JSON.stringify({
+          product_id: item.product_id,
+          quantity: item.quantity,
+        }),
+      });
     }
+
+    localStorage.removeItem("guest_cart");
+  
+  }
 
     return data;
   };
@@ -59,6 +69,26 @@ export const AuthProvider = ({ children }) => {
 
     if (data.token) {
       saveAuthData(data.token, data.user.id);
+
+    // MERGE GUEST CART
+    const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
+
+    for (const item of guestCart) {
+      await fetch("http://localhost:5000/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.token}`,
+        },
+        body: JSON.stringify({
+          product_id: item.product_id,
+          quantity: item.quantity,
+        }),
+      });
+    }
+
+    localStorage.removeItem("guest_cart");
+  
     }
 
     return data;
@@ -90,7 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, userId, login, register, logout, authFetch, redirectTo, setRedirectTo}}
+      value={{ token, userId, login, register, authFetch}}
     >
       {children}
     </AuthContext.Provider>

@@ -5,74 +5,48 @@ import { useCart } from "../context/CartContext";
 export default function ProductCard({ products = [] }) {
   const list = Array.isArray(products) ? products : [];
   const { cart, addToCart, updateQuantity } = useCart();
-  const [qtyMap, setQtyMap] = useState({});
-  const [hoveredId, setHoveredId] = useState(null);
 
 
-  useEffect(() => {
-  const map = {};
-  list.forEach((p) => {
-    const inCart = cart.find((i) => i.product_id === p.product_id);
-    map[p.product_id] = inCart?.quantity ?? 0; 
-  });
-  setQtyMap(map);
- }, [list, cart]);
+  // Get quantity from cart 
+  const getQuantity = (productId) => {
+    const item = cart.find((i) => i.product_id === productId);
+    return item ? item.quantity : 0;
+  };
 
 
 
-const changeQty = (productId, delta) => {
-  const prevQ = qtyMap[productId] ?? 0;
-  const nextQ = Math.max(0, prevQ + delta);
+  const handleIncrease = (product) => {
+    const currentQty = getQuantity(product.product_id);
 
-  // Update local UI state only
-  setQtyMap((prev) => ({
-    ...prev,
-    [productId]: nextQ,
-  }));
-
-  // Update global cart state AFTER
-  const inCart = cart.find((i) => i.product_id === productId);
-  const product = list.find((p) => p.product_id === productId);
-
-  if (inCart) {
-    if (nextQ === 0) {
-      updateQuantity(productId, 0);
+    if (currentQty === 0) {
+      addToCart(product); 
     } else {
-      updateQuantity(productId, nextQ);
+      updateQuantity(product.product_id, currentQty + 1);
     }
-  } else if (product && nextQ > 0) {
-    addToCart(product);
-  }
-};
+  };
 
+  const handleDecrease = (product) => {
+    const currentQty = getQuantity(product.product_id);
 
-
-const handleAdd = (productId) => {
-  const product = list.find((p) => p.product_id === productId);
-  if (!product) return;
-
-  addToCart(product);
-
-  setQtyMap((prev) => ({
-    ...prev,
-    [productId]: (prev[productId] ?? 0) + 1,
-  }));
-};
-
+    if (currentQty <= 1) {
+      updateQuantity(product.product_id, 0); // remove
+    } else {
+      updateQuantity(product.product_id, currentQty - 1);
+    }
+  };
 
 
   return (
     <main className="shop-products">
       {list.length > 0 ? (
         <div className="product-grid">
-          {list.map((product) => (
-            <div key={product.product_id} className="product-card"
-             onMouseEnter={() => setHoveredId(product.product_id)}
-              onMouseLeave={() => setHoveredId(null)}
-              >
-              <img
-                src={product.image_url}
-                alt={product.name}
+          {list.map((product) => {
+            const quantity = getQuantity(product.product_id);
+            return (
+              <div key={product.product_id} className="product-card">
+                <img
+                  src={product.image_url}
+                  alt={product.name}
                 className="product-image"
               />
 
@@ -85,15 +59,15 @@ const handleAdd = (productId) => {
                 <div className="quantity-controls">
                   <button
                     className="qty-btn"
-                    onClick={() => changeQty(product.product_id, -1)}
+                    onClick={() => handleDecrease(product)}
                   >
                     -
                   </button>
-                  <span className="qty-value">{qtyMap[product.product_id] ?? 0}</span>
+                  <span className="qty-value">{quantity}</span>
 
                   <button
                     className="qty-btn"
-                    onClick={() => changeQty(product.product_id, 1)}
+                    onClick={() => handleIncrease(product)}
                   >
                     +
                   </button>
@@ -101,14 +75,15 @@ const handleAdd = (productId) => {
 
                 <button
                   className="add-to-cart"
-                  onClick={() => handleAdd(product.product_id)}
-             
+                  onClick={() => handleIncrease(product)}
                 >
                   Add
                 </button>
+
               </div>
             </div>
-          ))}
+          );
+        })};
         </div>
       ) : (
         <p className="no-products">No products found.</p>

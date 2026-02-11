@@ -9,7 +9,7 @@ const router = express.Router();
 
 // ADD OR INCREMENT PRODUCT
 router.post("/add", authMiddleware, validateCartInput, getUserCart, async (req, res) => {
-  const { product_id, quantity=1} = req.body;
+  const { product_id, quantity} = req.body;
   const cart_id = req.cart_id;
 
 
@@ -55,7 +55,7 @@ router.post("/add", authMiddleware, validateCartInput, getUserCart, async (req, 
 
 // SET NEW QUANTITY — OVERWRITE
 router.post("/update", authMiddleware, validateCartInput, getUserCart, async (req, res) => {
-  const { product_id, quantity=1 } = req.body;
+  const { product_id, quantity } = req.body;
   const cart_id = req.cart_id;
   
 
@@ -99,7 +99,15 @@ router.get("/", authMiddleware, getUserCart, async (req, res) => {
 
   try {
     const items = await pool.query(
-      `SELECT product_id, quantity FROM cart_items WHERE cart_id = $1`,
+      `SELECT 
+        ci.product_id, 
+        ci.quantity,
+        p.name,
+        p.price,
+        p.image_url
+      FROM cart_items ci
+      JOIN products p ON ci.product_id = p.product_id
+      WHERE ci.cart_id = $1`,
       [cart_id]
     );
 

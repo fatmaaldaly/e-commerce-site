@@ -12,7 +12,7 @@ export const validateCartInput = (req, res, next) => {
       if (quantity !== undefined) {
         if (!Number.isInteger(quantity) || quantity < 0) {
         return res.status(400).json({
-            error: "quantity must be 0 or a positive integer",
+            error: "quantity must be a positive integer",
         });
         }
     }
