@@ -1,128 +1,67 @@
-import { createContext, useContext, useState, useEffect } from "react";
+// Creates a global state container for authentication.
+
+import { createContext, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+import {loginRequest, registerRequest} from "../services/authService";
+
 
 const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
 
+// this wraps your app, everything inside gets access to the auth context
 export const AuthProvider = ({ children }) => {
- 
-
+  // gets token from localStorage on first render, this keeps user logged in after refresh
   const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [userId, setUserId] = useState(() => localStorage.getItem("user_id"));
-  
-  
-  // Save auth data
-  const saveAuthData = (token, user_id) => {
-    setToken(token);
-    setUserId(user_id);
+  const [userId, setUserId] = useState(() =>localStorage.getItem("user_id"));
+  // const navigate = useNavigate();
+
+  // updates react state and saves data in localstorage
+  const saveAuth = (token, userId) => {
+    // React state → for UI updates
+    setToken(token); 
+    setUserId(userId);
+    // localStorage → for persistence
     localStorage.setItem("token", token);
-    localStorage.setItem("user_id", user_id);
+    localStorage.setItem("user_id", userId);
   };
 
+  const logout = () => {
+    setToken(null);
+    setUserId(null);
 
-  // Login
+    localStorage.removeItem("token");
+    localStorage.removeItem("user_id");
+    window.location.href = "/login";
+    // navigate("/login");
+  };
+
   const login = async (email, password) => {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
+    // calls api
+    const data = await loginRequest(email, password);
 
     if (data.token) {
-      saveAuthData(data.token, data.user.id);
-    
-    // MERGE GUEST CART
-    const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
-
-    for (const item of guestCart) {
-      await fetch("http://localhost:5000/api/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${data.token}`,
-        },
-        body: JSON.stringify({
-          product_id: item.product_id,
-          quantity: item.quantity,
-        }),
-      });
+      saveAuth(data.token, data.user.id);
     }
-
-    localStorage.removeItem("guest_cart");
-  
-  }
 
     return data;
   };
 
-
-  // Register
   const register = async (fullName, email, password) => {
-    const res = await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email, password }),
-    });
-
-    const data = await res.json();
+    const data = await registerRequest(fullName, email, password);
 
     if (data.token) {
-      saveAuthData(data.token, data.user.id);
-
-    // MERGE GUEST CART
-    const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
-
-    for (const item of guestCart) {
-      await fetch("http://localhost:5000/api/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${data.token}`,
-        },
-        body: JSON.stringify({
-          product_id: item.product_id,
-          quantity: item.quantity,
-        }),
-      });
-    }
-
-    localStorage.removeItem("guest_cart");
-  
+      saveAuth(data.token, data.user.id);
     }
 
     return data;
   };
-
-
-  // Authenticated fetch
-  const authFetch = async (url, options = {}) => {
-    if (!token) throw new Error("No token");
-
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        ...(options.headers || {}),
-      },
-    });
-
-    if (res.status === 401) {
-      logout();
-      throw new Error("Unauthorized");
-    }
-
-    return res;
-  };
-
-
 
   return (
     <AuthContext.Provider
-      value={{ token, userId, login, register, authFetch}}
+      value={{ token, userId, login, register, logout }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext;

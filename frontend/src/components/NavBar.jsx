@@ -1,8 +1,8 @@
-import { useState, useContext } from "react";
+import { useState} from "react";
 import { Link } from "react-router-dom";
 import "../style.css"
 import DarkModeToggle from "../components/DarkModeToggle";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 import Cart from "./Cart";
 import logo from "../assets/2.png";
 

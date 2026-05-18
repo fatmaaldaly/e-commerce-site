@@ -1,6 +1,6 @@
 import {useState} from "react";
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function Register(){
@@ -26,7 +26,7 @@ export default function Register(){
         setError(res.error || "Registration failed");
       }
     } catch (err) {
-      setError("Something went wrong");
+      setError("Something went wrong", err.message);
     }
   };
    

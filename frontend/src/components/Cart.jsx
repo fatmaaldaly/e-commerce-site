@@ -1,15 +1,13 @@
-import React, { useState } from "react";
 import "../style.css";
-import { useCart } from "../context/CartContext";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-
+import { useCart } from "../hooks/useCart";
+import { useNavigate} from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function Cart({isOpen, onClose}) {
-  const { cart, removeFromCart, clearCart, updateQuantity } = useCart();
+  const { cart, clearCart, total,  updateQuantity } = useCart();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const { token } = useAuth(); 
   
 
@@ -58,21 +56,28 @@ export default function Cart({isOpen, onClose}) {
                 <button onClick={()=> updateQuantity(item.product_id, item.quantity + 1)}>+</button>
               </div>
 
-              <div className="cart-item-price">
-                ${(item.price * item.quantity).toFixed(2)}
-              </div>
+              {/* <div className="cart-item-price">
+                {item.price && item.quantity
+                ? `EGP ${(item.price * item.quantity).toFixed(2)}`
+                : "EGP 0.00"}
+              </div> */}
 
-              <button
+              {/* <button
                 className="remove-btn"
                 onClick={() => removeFromCart(item.product_id)}
               >
                 ✕
-              </button>
+              </button> */}
             </li>
           ))}
      </ul>
 
       )}
+
+      <div className="cart-total">
+        <h3>Total: EGP {total.toFixed(2)}</h3>
+      </div>
+
 
 
       {cart.length > 0 && (

@@ -15,38 +15,51 @@ router.post("/add", authMiddleware, validateCartInput, getUserCart, async (req, 
 
   try {
 
-    // const item = await pool.query(
-    //   `SELECT cart_item_id FROM cart_items WHERE cart_id = $1 AND product_id = $2`,
-    //   [cart_id, product_id]
-    // );
+  // 1️⃣ Get product stock
+  const productResult = await pool.query(
+    `SELECT stock FROM products WHERE product_id = $1`,
+    [product_id]
+  );
 
-    // if (item.rows.length > 0) {
-    //   await pool.query(
-    //     `UPDATE cart_items SET quantity = quantity + $1 WHERE cart_item_id = $2`,
-    //     [quantity, item.rows[0].cart_item_id]
-    //   );
-    // } else {
-    //   await pool.query(
-    //     `INSERT INTO cart_items (cart_id, product_id, quantity)
-    //      VALUES ($1, $2, $3)`,
-    //     [cart_id, product_id, quantity]
-    //   );
-    // }
-    await pool.query(
-      `
-      INSERT INTO cart_items (cart_id, product_id, quantity)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (cart_id, product_id)
-      DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
-      `,
-      [cart_id, product_id, quantity]
-    );
+  if (productResult.rows.length === 0) {
+    return res.status(404).json({ error: "Product not found" });
+  }
 
+  const stock = productResult.rows[0].stock;
 
-    res.json({ message: "Cart updated" });
+  // 2️⃣ Get current quantity in cart
+  const existingItem = await pool.query(
+    `SELECT quantity FROM cart_items WHERE cart_id = $1 AND product_id = $2`,
+    [cart_id, product_id]
+  );
+
+  const currentQuantity = existingItem.rows.length > 0
+    ? existingItem.rows[0].quantity
+    : 0;
+
+  const newQuantity = currentQuantity + quantity;
+
+  // 3️⃣ Check stock
+  if (newQuantity > stock) {
+    return res.status(400).json({
+      error: `Only ${stock} items available in stock`
+    });
+  }
+
+  // 4️⃣ Insert or update
+  await pool.query(
+    `
+    INSERT INTO cart_items (cart_id, product_id, quantity)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (cart_id, product_id)
+    DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
+    `,
+    [cart_id, product_id, quantity]
+  );
+
+  res.json({ message: "Cart updated" });
 
   } catch (err) {
-    // res.status(500).json({ error: err.message });
     console.error("ADD TO CART ERROR:", err);
     res.status(500).json({ error: err.message });
   }
@@ -71,18 +84,37 @@ router.post("/update", authMiddleware, validateCartInput, getUserCart, async (re
 
         return res.json({ message: "Item removed from cart" });
       }
+
+      // 1️⃣ Get product stock
+      const productResult = await pool.query(
+        `SELECT stock FROM products WHERE product_id = $1`,
+        [product_id]
+      );
+
+      if (productResult.rows.length === 0) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      const stock = productResult.rows[0].stock;
+
+      // 2️⃣ Check stock
+      if (quantity > stock) {
+        return res.status(400).json({
+          error: `Only ${stock} items available in stock`
+        });
+      }
       
-    // UPDATE QUANTITY
-    const updateCart = await pool.query(
-      `UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND product_id = $3`,
-      [quantity, cart_id, product_id]
-    );
+      // UPDATE QUANTITY
+      const updateCart = await pool.query(
+        `UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND product_id = $3`,
+        [quantity, cart_id, product_id]
+      );
 
-    if(updateCart.rowCount === 0){
-        return res.status(404).json({ error: "Product not found in cart." });
-    }
+      if(updateCart.rowCount === 0){
+          return res.status(404).json({ error: "Product not found in cart." });
+      }
 
-    res.json({ message: "Quantity updated" });
+      res.json({ message: "Quantity updated" });
 
   } catch (err) {
     // res.status(500).json({ error: err.message });
@@ -120,6 +152,24 @@ router.get("/", authMiddleware, getUserCart, async (req, res) => {
   
   }
 });
+
+
+// clear cart
+router.delete("/clear", authMiddleware, getUserCart, async (req, res) => {
+  try {
+    await pool.query(
+      `DELETE FROM cart_items WHERE cart_id = $1`,
+      [req.cart_id]
+    );
+
+    res.json({ message: "Cart cleared" });
+  } catch (err) {
+    console.error("CLEAR CART ERROR:", err);
+    res.status(500).json({ error: "Failed to clear cart" });
+  }
+});
+
+
 
 
 export default router;

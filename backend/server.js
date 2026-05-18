@@ -88,7 +88,9 @@ app.use((err, req, res, next) => {
 });
 
 
-
+process.on("uncaughtException", (err) => {
+  console.log("🔥 Uncaught error:", err);
+});
 
 // start server
 const port = process.env.PORT || 5000;

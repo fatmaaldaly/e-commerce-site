@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CategoryList from "../components/CategoryList";
 import { useLocation } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 import ProductCard from "../components/ProductCard";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";

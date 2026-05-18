@@ -14,6 +14,7 @@ export default function Footer(){
                 <polyline points="22,6 12,13 2,6"></polyline>
               </svg>
               <span>ecommerce@gmail.com</span>
+  
             </div>
             <div class="contact-item">
               <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

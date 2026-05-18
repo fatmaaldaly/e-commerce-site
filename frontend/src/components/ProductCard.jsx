@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect } from "react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 
 export default function ProductCard({ products = [] }) {
   const list = Array.isArray(products) ? products : [];

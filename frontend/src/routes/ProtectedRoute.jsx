@@ -1,33 +1,26 @@
-// import { useAuth } from "../context/AuthContext";
-// import { Navigate } from "react-router-dom";
-
-// export default function ProtectedRoute({ children }) {
-//   const { token } = useAuth();
-
-//   if (!token) {
-//     localStorage.setItem("redirect_after_login", window.location.pathname);
-//     return <Navigate to="/login" />;
-//   }
-
-//   return children;
-// }
+// checks if user is logged in: if yes-show page ,if no-redirect to login page
+// navigate: to redirect user to another route
+// useLocation: gives info about current page url, used to remember where user wanted to go
+// Provides authentication data like token
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
+
 
 export default function ProtectedRoute({ children }) {
   const { token } = useAuth();
   const location = useLocation();
-
+  
+  // if no token, redirect to login
   if (!token) {
-    // Redirect to login and remember where the user wanted to go
     return (
       <Navigate
         to="/login"
+        // stores were user wanted to go before being redirected to login
         state={{ from: location }}
         replace
       />
     );
   }
-
+  // if token exists, show the page
   return children;
 }

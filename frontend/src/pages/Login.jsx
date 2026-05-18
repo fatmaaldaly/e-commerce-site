@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import "../auth.css"; // Make sure to create this CSS file
+import { useAuth } from "../hooks/useAuth";
+import { GoogleLogin } from '@react-oauth/google';
+import FacebookLogin from "@greatsumini/react-facebook-login";
+import "../auth.css"; 
 
 export default function AuthCard() {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,17 +13,19 @@ export default function AuthCard() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, setRedirectTo } = useAuth();
-
-  const handleGoogleLogin = () => {
-    // Placeholder for Google OAuth logic
-    console.log("Google login clicked");
+  const { login, register} = useAuth();
+  
+  const handleGoogleLogin = (credentialResponse) => {
+    const token = credentialResponse.credential;
+    // Send token to backend to verify or create user
+    console.log("Google token:", token);
   };
 
-  const handleFacebookLogin = () => {
-    // Placeholder for Facebook OAuth logic
-    console.log("Facebook login clicked");
-  };
+  const handleFacebookLogin = (response) => {
+  console.log("Facebook response:", response);
+  // Send response.accessToken to backend to verify/create user
+ };
+
 
   const handleLogin = async () => {
     try {
@@ -35,7 +39,7 @@ export default function AuthCard() {
         setError(res.error || "Login failed");
       }
     } catch (err) {
-      setError("Something went wrong");
+      setError("Something went wrong", err.message);
     }
   };
 
@@ -51,7 +55,7 @@ export default function AuthCard() {
         setError(res.error || "Registration failed");
       }
     } catch (err) {
-      setError("Something went wrong");
+      setError("Something went wrong", err.message);
     }
   };
   
@@ -101,14 +105,25 @@ export default function AuthCard() {
               {/* Social login buttons */}
               <p className="continue-with">or continue with</p>
               <div className="social-login">
-                <button className="google-btn" onClick={handleGoogleLogin}>
+                {/* <button className="google-btn" onClick={handleGoogleLogin}>
                   <img src="/google-icon.png" alt="Google" className="icon" />
                   Google
-                </button>
-                <button className="facebook-btn" onClick={handleFacebookLogin}>
+                </button> */}
+                <GoogleLogin
+                  onSuccess={handleGoogleLogin}
+                  onError={() => setError("Google login failed")}
+                />
+
+                {/* <button className="facebook-btn" onClick={handleFacebookLogin}>
                   <img src="/facebook-icon.png" alt="Facebook" className="icon" />
                   Facebook
-                </button>
+                </button> */}
+                <FacebookLogin
+                  appId="YOUR_FACEBOOK_APP_ID"
+                  autoLoad={false}
+                  fields="name,email,picture"
+                  callback={handleFacebookLogin}
+                />
               </div>
             </div>
           ) : (
