@@ -1,4 +1,4 @@
-import pool from "../index.js";
+import pool from "../../db.js"; 
 import express from "express";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { validateCartInput } from "../middleware/validateCartInputMiddleware.js";

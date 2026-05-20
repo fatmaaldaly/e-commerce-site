@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 
 
-export default function Category({ onCategoryClick, selectedCategory }) {
+export default function Category({selectedCategory }) {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 

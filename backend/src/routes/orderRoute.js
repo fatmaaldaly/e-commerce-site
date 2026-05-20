@@ -1,5 +1,5 @@
 import express from "express";
-import pool from "../index.js";
+import pool from "../../db.js"; 
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { validateOrder} from "../middleware/validateOrderMiddleware.js";
 

@@ -1,4 +1,4 @@
-import pool from "../index.js";
+import pool from "../../db.js";
 
 export const validateOrder = async (req, res, next) =>{
    
