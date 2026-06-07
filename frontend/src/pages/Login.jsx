@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { GoogleLogin } from '@react-oauth/google';
-import FacebookLogin from "@greatsumini/react-facebook-login";
 import "../auth.css"; 
 
 export default function AuthCard() {
@@ -12,7 +11,6 @@ export default function AuthCard() {
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, register} = useAuth();
   
   const handleGoogleLogin = (credentialResponse) => {
@@ -21,10 +19,7 @@ export default function AuthCard() {
     console.log("Google token:", token);
   };
 
-  const handleFacebookLogin = (response) => {
-  console.log("Facebook response:", response);
-  // Send response.accessToken to backend to verify/create user
- };
+
 
 
   const handleLogin = async () => {
@@ -33,8 +28,7 @@ export default function AuthCard() {
       const res = await login(email, password);
       
       if (res.token) {
-        const redirectPath = location.state?.from === "checkout" ? "/checkout" : "/";
-        navigate(redirectPath, { replace: true });
+        navigate("/");
       } else {
         setError(res.error || "Login failed");
       }
@@ -49,8 +43,7 @@ export default function AuthCard() {
       const res = await register(fullName, email, password);
       
       if (res.token) {
-        const redirectPath = location.state?.from === "checkout" ? "/checkout" : "/";
-        navigate(redirectPath, { replace: true });
+        navigate("/");
       } else {
         setError(res.error || "Registration failed");
       }
@@ -114,16 +107,6 @@ export default function AuthCard() {
                   onError={() => setError("Google login failed")}
                 />
 
-                {/* <button className="facebook-btn" onClick={handleFacebookLogin}>
-                  <img src="/facebook-icon.png" alt="Facebook" className="icon" />
-                  Facebook
-                </button> */}
-                <FacebookLogin
-                  appId="YOUR_FACEBOOK_APP_ID"
-                  autoLoad={false}
-                  fields="name,email,picture"
-                  callback={handleFacebookLogin}
-                />
               </div>
             </div>
           ) : (
@@ -156,10 +139,6 @@ export default function AuthCard() {
                 <button className="google-btn" onClick={handleGoogleLogin}>
                   <img src="/google-icon.png" alt="Google" className="icon" />
                   Google
-                </button>
-                <button className="facebook-btn" onClick={handleFacebookLogin}>
-                  <img src="/facebook-icon.png" alt="Facebook" className="icon" />
-                  Facebook
                 </button>
               </div>
 

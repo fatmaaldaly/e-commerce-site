@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { createUser, findUserByEmail } from "../models/authModel.js";
 import { generateToken } from "../utils/generateToken.js";
 
+
 export const register = async ({ fullName, email, password }) => {
 
   const userExists = await findUserByEmail(email);
@@ -34,6 +35,7 @@ export const register = async ({ fullName, email, password }) => {
     }
   };
 };
+
 
 export const login = async ({ email, password }) => {
 

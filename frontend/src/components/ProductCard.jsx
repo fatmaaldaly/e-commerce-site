@@ -51,7 +51,7 @@ export default function ProductCard({ products = [] }) {
 
               <div className="product-header">
                 <h3 className="product-name">{product.name}</h3>
-                <p className="product-price">EGP {product.price}</p>
+                <p className="product-price">$ {product.price}</p>
               </div>
 
               <div className="product-footer">

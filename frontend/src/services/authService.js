@@ -1,44 +1,35 @@
 // api layer for communication with backend
+import api from "../lib/api";
 
-const API_URL = "http://localhost:5000";
-
-const config = {
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
-
-export const loginRequest = async (email, password) => {
-  const res = await fetch(`${API_URL}/api/auth/login`, {
-    method: "POST",
-    headers: config.headers,
-    body: JSON.stringify({ email, password }),
-  });
-
-  // return res.json();
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || "Login failed");
-  }
-
-  return data;
-};
 
 export const registerRequest = async (fullName, email, password) => {
-  const res = await fetch(`${API_URL}/api/auth/register`, {
-    method: "POST",
-    headers: config.headers,
-    body: JSON.stringify({ fullName, email, password }),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || "Registration failed");
+  try{
+    const res = await api.post("/auth/register", {
+      fullName,
+      email,
+      password,
+    });
+    return res.data;
+  
+  }catch(error){
+    return {
+      error: error.response?.data?.error || "Registration failed",
+    };
   }
+}
 
-  return data;
 
-  // return res.json();
-};
+export const loginRequest = async (email, password) => {
+  try{
+    const res = await api.post("/auth/login", {
+      email, 
+      password,
+    });
+    return res.data;
+  
+  }catch(error){
+    return {
+      error: error.response?.data?.error || "Login failed",
+    };
+  }
+}

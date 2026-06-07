@@ -5,9 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 
 
 export default function Cart({isOpen, onClose}) {
-  const { cart, clearCart, total,  updateQuantity } = useCart();
+  const { cart, total,  updateQuantity, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
-  // const location = useLocation();
   const { token } = useAuth(); 
   
 
@@ -22,8 +21,6 @@ export default function Cart({isOpen, onClose}) {
   };
 
 
-
-  
   return (
     <div className={`cart-sidebar ${isOpen ? "open" : ""}`}>
       <button className="close-cart-btn" onClick={onClose}>
@@ -47,27 +44,20 @@ export default function Cart({isOpen, onClose}) {
 
               <div className="cart-item-details">
                 <h4>{item.name}</h4>
-                <p>EGP{item.price}</p>
+                <p>${item.price}</p>
               </div>
 
               <div className="cart-item-quantity">
-                <button onClick={()=> updateQuantity(item.product_id, item.quantity - 1)}>-</button>
+                <button 
+                onClick={()=> updateQuantity(item.product_id, item.quantity - 1)}>-</button>
                 <span>{item.quantity}</span>
-                <button onClick={()=> updateQuantity(item.product_id, item.quantity + 1)}>+</button>
+                <button 
+                onClick={()=> updateQuantity(item.product_id, item.quantity + 1)}>+</button>
               </div>
-
-              {/* <div className="cart-item-price">
-                {item.price && item.quantity
-                ? `EGP ${(item.price * item.quantity).toFixed(2)}`
-                : "EGP 0.00"}
-              </div> */}
-
-              {/* <button
-                className="remove-btn"
-                onClick={() => removeFromCart(item.product_id)}
-              >
+              <button className="remove-item-btn" 
+                onClick={()=> removeFromCart(item.product_id)}>
                 ✕
-              </button> */}
+              </button>
             </li>
           ))}
      </ul>
@@ -75,7 +65,7 @@ export default function Cart({isOpen, onClose}) {
       )}
 
       <div className="cart-total">
-        <h3>Total: EGP {total.toFixed(2)}</h3>
+        <h3>Total: ${total.toFixed(2)}</h3>
       </div>
 
 

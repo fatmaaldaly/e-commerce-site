@@ -3,7 +3,7 @@ import {
   getCartRequest,
   addToCartRequest,
   updateQuantityRequest,
-  // removeFromCartRequest,
+  removeFromCartRequest,
   clearCartRequest,
 } from "../services/cartService";
 import { useAuth } from "../hooks/useAuth";
@@ -18,8 +18,9 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     if (!token) return;
     const data = await getCartRequest(token);
-    console.log("CART API RESPONSE:", data);
+    console.log("Cart API Response:", data);
     setCart(data.items || []);
+    console.log(data);
   };
 
   useEffect(() => {
@@ -38,18 +39,18 @@ export const CartProvider = ({ children }) => {
   };
 
   
-  const updateQuantity = async (productId, quantity) => {
+  const updateQuantity = async (product_id, quantity) => {
     if (quantity <= 0) return;
 
-    await updateQuantityRequest(productId, quantity, token);
+    await updateQuantityRequest(product_id, quantity, token);
     fetchCart();
   };
 
 
-//  const removeFromCart = async (productId) => {
-//     await removeFromCartRequest(productId, token);
-//     fetchCart();
-//   };
+ const removeFromCart = async (product_id) => {
+    await removeFromCartRequest(product_id, token);
+    fetchCart();
+  };
 
 
   const clearCart = async () => {
@@ -70,7 +71,7 @@ export const CartProvider = ({ children }) => {
         total,
         addToCart,
         updateQuantity,
-        // removeFromCart,
+        removeFromCart,
         clearCart,
       }}
     >

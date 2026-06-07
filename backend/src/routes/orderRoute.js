@@ -1,7 +1,7 @@
 import express from "express";
 import pool from "../../db.js"; 
-import { authMiddleware } from "../middleware/authMiddleware.js";
-import { validateOrder} from "../middleware/validateOrderMiddleware.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { validateOrder} from "../middlewares/validateOrderMiddleware.js";
 
 const router = express.Router();
 

@@ -14,18 +14,20 @@ import orderRoutes from "./routes/orderRoute.js";
 import paymentRoutes from "./routes/paymentRoute.js";
 
 import { aj } from "./lib/arcjet.js";
-import { errorHandler } from "./middleware/errorMiddleware.js";
+import { errorHandler } from "./middlewares/errorMiddleware.js";
 
 dotenv.config();
 
 const app = express();
 
 
-
 // Middlewares
 app.use(express.json());
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 
 app.use(
   helmet({
@@ -39,57 +41,58 @@ app.use(morgan("dev"));
 
 
 // Arcjet Protection Middleware
-app.use(async (req, res, next) => {
-  try {
+// app.use(async (req, res, next) => {
+//   try {
 
-    const decision = await aj.protect(req, {
-      requested: 1,
-    });
+//     const decision = await aj.protect(req, {
+//       requested: 1,
+//     });
 
-    if (decision.isDenied()) {
+//     if (decision.isDenied()) {
 
-      if (decision.reason.isRateLimit()) {
-        return res
-          .status(429)
-          .json({ error: "Too Many Requests" });
-      }
+//       if (decision.reason.isRateLimit()) {
+//         return res
+//           .status(429)
+//           .json({ error: "Too Many Requests" });
+//       }
 
-      if (decision.reason.isBot()) {
-        return res
-          .status(403)
-          .json({ error: "Bot access denied" });
-      }
+//       if (decision.reason.isBot()) {
+//         return res
+//           .status(403)
+//           .json({ error: "Bot access denied" });
+//       }
 
-      return res
-        .status(403)
-        .json({ error: "Forbidden" });
-    }
+//       return res
+//         .status(403)
+//         .json({ error: "Forbidden" });
+//     }
 
     // Detect spoofed bots
-    const isSpoofedBot = decision.results.some(
-      (result) =>
-        result.reason.isBot() &&
-        result.reason.isSpoofed()
-    );
+//     const isSpoofedBot = decision.results.some(
+//       (result) =>
+//         result.reason.isBot() &&
+//         result.reason.isSpoofed()
+//     );
 
-    if (isSpoofedBot) {
-      return res
-        .status(403)
-        .json({ error: "Spoofed bot detected" });
-    }
+//     if (isSpoofedBot) {
+//       return res
+//         .status(403)
+//         .json({ error: "Spoofed bot detected" });
+//     }
 
-    next();
+//     next();
 
-  } catch (error) {
+//   } catch (error) {
 
-    console.error("Arcjet Error:", error);
+//     console.error("Arcjet Error:", error);
 
-    next(error);
-  }
-});
+//     next(error);
+//   }
+// });
 
 
 // Static Uploads Folder
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -97,6 +100,11 @@ app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"))
 );
+
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 
 // Routes

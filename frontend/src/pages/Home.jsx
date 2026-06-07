@@ -14,8 +14,7 @@ export default function Home() {
       <Hero/>
       <Features/>
       <Category/>
-      <Footer/>
-     
+      <Footer/> 
     </div>
    
   )
