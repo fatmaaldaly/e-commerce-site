@@ -91,5 +91,5 @@ export const clearCart = async (cart_id) => {
     return  await pool.query(`
         DELETE FROM cart_items
         WHERE cart_id = $1
-        RETURNING *`, [cart_id])
+       `, [cart_id])
 }

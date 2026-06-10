@@ -1,5 +1,5 @@
 import { addToCartService, getCartService, 
-    updateCartItemQuantityService, removeFromCartService } 
+    updateCartItemQuantityService, removeFromCartService, clearCartService } 
 from "../services/cartService.js";
 
 

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import Auth from "./pages/Auth";
 import Shop from "./pages/Shop";
 import ScrollToTop from "./components/ScrollToTop";
 import { CartProvider } from "./context/CartContext";
@@ -21,7 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Auth />} />
             <Route path="/checkout" element={<ProtectedRoute>
               <Checkout />
             </ProtectedRoute> }/>
