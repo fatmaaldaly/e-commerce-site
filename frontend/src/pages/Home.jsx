@@ -3,17 +3,21 @@ import Hero from '../components/Hero'
 import Footer from '../components/Footer'
 import Features from '../components/Features'
 import Category from '../components/Category'
+import MostPopular from '@/components/MostPopular'
+import Brand from "../components/Brand";
 
 export default function Home() {
   
 
-
   return (
     <div>
-      <NavBar />
+      <NavBar/>
       <Hero/>
-      <Features/>
+      
       <Category/>
+      <Brand/>
+      <MostPopular/>
+     
       <Footer/> 
     </div>
    

@@ -1,29 +1,32 @@
-import React, { useEffect, useState } from "react";
+import { useCategory } from "../hooks/useCategory";
 
+export default function CategoryList({
+  onCategoryClick,
+  selectedCategory
+}) {
+  const { categories, loading } = useCategory();
 
-export default function CategoryList({ onCategoryClick, selectedCategory }) {
-  const [categories, setCategories] = useState([]);
+  if (loading) return <p>Loading...</p>;
 
-  // loads all categories from the backend when the sidebar first shows up
-  useEffect(() => {
-    fetch("http://localhost:5000/api/categories")
-      .then((res) => res.json())
-      .then((data) =>{
-        // Add "All" manually at the start of the list
-        const allCategories = [{ category_id: 0, name: "All" }, ...data];
-       setCategories(allCategories)})
-      .catch((err) => console.error("Error fetching categories:", err));
-  }, []);
+  const allCategories = [
+    { category_id: 0, name: "All" },
+    ...categories,
+  ];
 
   return (
-    <div className="category-list-container">
-      <h2 className="category-list-title">Categories</h2>
-      <ul className="category-list">
-        {categories.map((cat) => (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-rose-800 mb-4">Categories</h2>
+
+      <ul className="flex flex-wrap gap-3">
+        {allCategories.map((cat) => (
           <li
             key={cat.category_id}
-            className={`category-list-item ${selectedCategory === cat.name ? "active" : ""}`}
-            onClick={() => onCategoryClick && onCategoryClick(cat.name)}
+            onClick={() => onCategoryClick(cat.name)}
+            className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium cursor-pointer select-none transition-all duration-200 ${
+              selectedCategory === cat.name
+                ? "bg-rose-800 text-white shadow-lg"
+                : "bg-white/60 text-rose-800 hover:bg-rose-50 hover:scale-105"
+            }`}
           >
             {cat.name}
           </li>

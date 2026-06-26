@@ -116,7 +116,7 @@ app.use("/api/products", productRoutes);
 
 app.use("/api/cart", cartRoutes);
 
-app.use("/api/order", orderRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.use("/api/payment", paymentRoutes);
 

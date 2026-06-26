@@ -1,28 +1,40 @@
 import React, { useEffect, useState } from "react";
-import CategoryList from "../components/CategoryList";
 import { useLocation } from "react-router-dom";
-import { useCart } from "../hooks/useCart";
+
+import CategoryList from "../components/CategoryList";
 import ProductCard from "../components/ProductCard";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+
+import { useCart } from "../hooks/useCart";
+import { getProductsRequest } from "../services/productService";
+
 import "../shop.css";
 
 
 export default function Shop() {
-  const [products, setProducts] = useState([]); 
-  const [filteredProducts, setFilteredProducts] = useState([]); 
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const [loading, setLoading] = useState(false);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10; // products per page
+
+  const limit = 10;
+
   const location = useLocation();
+
   const { addToCart } = useCart();
 
-
-  // Read the category from URL query parameter, Runs every time the URL changes
+  // Read category from URL
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const categoryFromURL = decodeURIComponent(queryParams.get("category") || "");
+
+    const categoryFromURL = decodeURIComponent(
+      queryParams.get("category") || ""
+    );
 
     if (categoryFromURL) {
       setSelectedCategory(categoryFromURL);
@@ -30,115 +42,102 @@ export default function Shop() {
   }, [location]);
 
 
-  // Fetch products
-    useEffect(() => {
-    fetch(`http://localhost:5000/api/products?page=${page}&limit=${limit}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data.data);       
-        setFilteredProducts(data.data);
-        setTotalPages(data.totalPages);
-      })
-      .catch((err) => console.error("Error fetching products:", err));
-    }, [page]);
 
 
+  // Fetch products when page changes
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
 
-  // runs whenever selectedCategory or products changes
+        const data = await getProductsRequest(page, limit);
+        console.log("shop data: ", data.data.data);
+        setProducts(data.data.data || []);          
+        
+        setTotalPages(data.totalPages || 1);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [page]);
+
+
+  // Filter products by category
   useEffect(() => {
     if (selectedCategory === "All") {
       setFilteredProducts(products);
     } else {
       const filtered = products.filter(
-        (p) => p.category_name === selectedCategory
+        (product) => product.category_name === selectedCategory
       );
+
       setFilteredProducts(filtered);
     }
   }, [selectedCategory, products]);
 
 
-  // Updates the selected category when you click a button in the sidebar
-  const handleCategoryClick = (categoryName) => {
-    setSelectedCategory(categoryName);
-    // reset page when category changes
-    setPage(1); 
+  const handleCategoryClick = (category_name) => {
+    setSelectedCategory(category_name);
+    setPage(1);
   };
+  useEffect(() => {
+}, [products, filteredProducts]);
 
+  if (loading) {
+    return (
+      <>
+        <NavBar />
+        <h2 style={{ textAlign: "center", marginTop: "40px" }}>
+          Loading products...
+        </h2>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
-     <NavBar />
-      <div className="shop-content">
-         
-        {/* Sidebar */}
-        <aside className="shop-sidebar">
-          
-          <CategoryList
+      <NavBar />
+
+      {/* Categories on top */}
+      <div className="w-full bg-transparent pt-20 md:pt-24">
+        <CategoryList
           onCategoryClick={handleCategoryClick}
           selectedCategory={selectedCategory}
-          />
-        </aside>
+        />
+      </div>
 
-        {/* Product Grid */}
-        {/* <ProductCard products={filteredProducts} addToCart={addToCart} /> */}
-
-
-        {/* Pagination */}
-        {/* <div className="pagination">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-            >
-              Prev
-            </button>
-
-            {[...Array(totalPages)].map((_, index) => {
-              const pageNumber = index + 1;
-              return (
-                <button
-                  key={pageNumber}
-                  onClick={() => setPage(pageNumber)}
-                  className={page === pageNumber ? "active" : ""}
-                >
-                  {pageNumber}
-                </button>
-              );
-            })}
-
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next
-            </button>
-        
-        </div> */}
-
-        {/* Products Section */}
-        <div className="shop-products">
-
-          {/* Product Grid */}
-          <ProductCard
-            products={filteredProducts}
-            addToCart={addToCart}
-          />
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Products */}
+        <div className="w-full">
+          <ProductCard products={filteredProducts} addToCart={addToCart} />
 
           {/* Pagination */}
-          <div className="pagination">
+          <div className="mt-20 mb-20 flex justify-center items-center gap-2">
             <button
               disabled={page === 1}
-              onClick={() => setPage(page - 1)}
+              onClick={() => setPage((prev) => prev - 1)}
+              className="px-3 py-1 rounded-md bg-gray-100 disabled:opacity-50"
             >
               Prev
             </button>
 
             {[...Array(totalPages)].map((_, index) => {
               const pageNumber = index + 1;
+
               return (
                 <button
                   key={pageNumber}
                   onClick={() => setPage(pageNumber)}
-                  className={page === pageNumber ? "active" : ""}
+                  className={`px-3 py-1 rounded-md ${
+                    page === pageNumber
+                      ? "bg-pink-500 text-white"
+                      : "bg-gray-100"
+                  }`}
                 >
                   {pageNumber}
                 </button>
@@ -147,19 +146,16 @@ export default function Shop() {
 
             <button
               disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
+              onClick={() => setPage((prev) => prev + 1)}
+              className="px-3 py-1 rounded-md bg-gray-100 disabled:opacity-50"
             >
               Next
             </button>
           </div>
-
         </div>
+      </main>
 
-
-
-     
-      </div>
-    <Footer />
-   </>
+      <Footer />
+    </>
   );
 }

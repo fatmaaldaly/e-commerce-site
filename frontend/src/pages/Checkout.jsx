@@ -1,28 +1,25 @@
-
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { useCart } from "../hooks/useCart";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import checkout from "../services/checkoutService";
 
 export default function Checkout() {
-  const { cart, clearCart } = useCart();
-  const { token } = useAuth(); 
+  const { cart } = useCart();
+  const { token } = useAuth();
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
     address: "",
+    payment: "cod",
   });
+
   const [error, setError] = useState("");
 
   if (!token) return null;
 
-  
-  
-  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -43,144 +40,151 @@ export default function Checkout() {
     }
 
     try {
-      // 1) Create order
-      const orderRes = await fetch("http://localhost:5000/api/order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,  
-        },
-        body: JSON.stringify({}),
-      });
-
-      if (!orderRes.ok) throw new Error("Failed to create order");
-      const orderData = await orderRes.json();
-      if (!orderData.order_id) {
-        throw new Error("Order ID missing");
-      }
-      const order_id = orderData.order_id;
-
-      // 2) Pay for the order
-      const paymentRes = await fetch("http://localhost:5000/api/payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-        order_id,
-        method: "card",
-      })
-
-      });
-
-      if (!paymentRes.ok) throw new Error("Payment failed");
-
-     
-      clearCart();
+      await checkout(form);
       navigate("/success");
     } catch (err) {
-      console.error(err);
-      setError("Something went wrong while placing the order");
+      setError(
+        err?.response?.data?.error ||
+          "Something went wrong while placing the order"
+      );
     }
   };
 
   return (
-    <div className="checkout">
-      <div className="checkout-card">
-        <div className="left-side">
-          <h2>Checkout</h2>
-          <form className="checkout-form" onSubmit={handleSubmit}>
-            {error && <p className="error">{error}</p>}
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <button>
+        <a href="/shop" className="text-black">
+          &larr; Back to Cart
+        </a>
+      </button>
+      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          
+          {/* LEFT SIDE - FORM */}
+          <div className="p-6 md:p-10">
+            <h2 className="text-2xl font-bold mb-6">Checkout</h2>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone (11 digits)"
-              value={form.phone}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="address"
-              placeholder="Delivery Address"
-              value={form.address}
-              onChange={handleChange}
-              required
-            />
+            {error && (
+              <div className="mb-4 text-red-600 bg-red-100 p-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
-            <h3>Card Payment</h3>
-            <input
-              type="text"
-              name="cardNumber"
-              placeholder="Card Number"
-              value={form.cardNumber}
-              onChange={handleChange}
-              required
-            />
-            <div className="row">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
-                name="expiry"
-                placeholder="MM/YY"
-                value={form.expiry}
+                name="name"
+                placeholder="Full Name"
+                value={form.name}
                 onChange={handleChange}
+                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
                 required
               />
+
               <input
                 type="text"
-                name="cvv"
-                placeholder="CVV"
-                value={form.cvv}
+                name="phone"
+                placeholder="Phone (11 digits)"
+                value={form.phone}
                 onChange={handleChange}
+                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
                 required
               />
-            </div>
 
-            <button type="submit" className="checkout-btn">
-              Place Order
-            </button>
-          </form>
-        </div>
+              <input
+                type="text"
+                name="address"
+                placeholder="Delivery Address"
+                value={form.address}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
+                required
+              />
 
-        <div className="vertical-line"></div>
+              {/* PAYMENT */}
+              <div className="pt-2">
+                <h3 className="font-semibold mb-2">Payment Method</h3>
 
-        <div className="right-side">
-          <h3>Your Order</h3>
-          {cart.length === 0 ? (
-            <p>No items in cart.</p>
-          ) : (
-            <ul className="summary-items">
-              {cart.map((item) => (
-                <li key={item.product_id} className="summary-item">
-                  <img src={item.image_url} alt={item.name} className="summary-img" />
-                  <div className="summary-info">
-                    <h4>{item.name}</h4>
-                    <p>Price: EGP {item.price}</p>
-                    <p>Qty: {item.quantity}</p>
-                    <p className="summary-subtotal">
-                      Subtotal: EGP {(item.price * item.quantity).toFixed(2)}
-                    </p>
+                <label className="flex items-center gap-2 mb-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="cod"
+                    checked={form.payment === "cod"}
+                    onChange={handleChange}
+                  />
+                  Cash on Delivery
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="paymob"
+                    checked={form.payment === "paymob"}
+                    onChange={handleChange}
+                  />
+                  Paymob
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition"
+              >
+                Place Order
+              </button>
+            </form>
+          </div>
+
+          {/* RIGHT SIDE - CART SUMMARY */}
+          <div className="bg-gray-50 p-6 md:p-10 border-t md:border-t-0 md:border-l">
+            <h3 className="text-xl font-semibold mb-4">Your Order</h3>
+
+            {cart.length === 0 ? (
+              <p className="text-gray-500">No items in cart.</p>
+            ) : (
+              <div className="space-y-4 max-h-100 overflow-y-auto pr-2">
+                {cart.map((item) => (
+                  <div
+                    key={item.product_id}
+                    className="flex gap-4 bg-white p-3 rounded-lg shadow-sm"
+                  >
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="w-16 h-16 object-cover rounded-md"
+                    />
+
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{item.name}</h4>
+                      <p className="text-sm text-gray-600">
+                        Price: ${Number(item.price).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Qty: {item.quantity}
+                      </p>
+                      <p className="text-sm font-semibold">
+                        Subtotal: $
+                        {Number(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
-          <h3 className="summary-total">
-            Total: EGP {cart.reduce((sum, c) => sum + c.price * c.quantity, 0).toFixed(2)}
-          </h3>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-6 border-t pt-4">
+              <h3 className="text-lg font-bold">
+                Total: $
+                {Number(
+                  cart.reduce((sum, c) => sum + c.price * c.quantity, 0)
+                ).toFixed(2)}
+              </h3>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

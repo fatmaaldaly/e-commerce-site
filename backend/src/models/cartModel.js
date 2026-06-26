@@ -64,13 +64,19 @@ export const getCartItems = async (cart_id) => {
     console.log("DB Cart ID:", cart_id);
 
     const cart = await pool.query(
-        `SELECT ci.*, p.name, p.price, p.image_url
-        FROM cart_items ci
-        JOIN products p on ci.product_id = p.product_id
-        WHERE ci.cart_id = $1
-        ORDER BY ci.cart_item_id;`,
-        [cart_id]
-    )
+        `SELECT 
+         ci.product_id,
+         ci.quantity,
+         p.name,
+         p.price,
+         p.stock,
+         p.image_url
+         FROM cart_items ci
+         JOIN products p ON ci.product_id = p.product_id
+         WHERE ci.cart_id = $1
+         ORDER BY ci.cart_item_id;`,
+         [cart_id]
+    );
      
     return cart.rows;
 }
@@ -93,3 +99,15 @@ export const clearCart = async (cart_id) => {
         WHERE cart_id = $1
        `, [cart_id])
 }
+
+
+// for clearing cart within transaction
+export const clearCartTx = async (client, cart_id) => {
+    return await client.query(
+      `
+      DELETE FROM cart_items
+      WHERE cart_id = $1
+      `,
+      [cart_id]
+    );
+};

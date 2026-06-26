@@ -4,42 +4,63 @@ import { useAuth } from "../hooks/useAuth";
 import { GoogleLogin } from '@react-oauth/google';
 import "../auth.css"; 
 
+
 export default function AuthCard() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, register} = useAuth();
+  const { login, register, googleLogin } = useAuth();
   
-  const handleGoogleLogin = (credentialResponse) => {
-    const token = credentialResponse.credential;
-    // Send token to backend to verify or create user
-    console.log("Google token:", token);
-  };
-
+   const handleGoogleLogin = async (credentialResponse) => {
+   try {
+     setError("");
+     setGoogleLoading(true);
+ 
+     const res = await googleLogin(credentialResponse.credential);
+ 
+     if (res.token) {
+       navigate("/");
+     } else {
+       setError(res.error || "Google login failed");
+     }
+   } catch (err) {
+     setError(err.message || "Something went wrong");
+   
+    }finally {
+      setGoogleLoading(false);
+    }
+ };
 
 
 
   const handleLogin = async () => {
     try {
       setError("");
+      setLoading(true);
       const res = await login(email, password);
-      
+      console.log("Result:", res);
       if (res.token) {
         navigate("/");
       } else {
         setError(res.error || "Login failed");
       }
     } catch (err) {
-      setError("Something went wrong", err.message);
+      setError(err.message || "Something went wrong");
+    }finally {
+      setLoading(false);
     }
   };
+
 
   const handleRegister = async () => {
     try {
       setError("");
+      setLoading(true);
       const res = await register(fullName, email, password);
       
       if (res.token) {
@@ -48,7 +69,9 @@ export default function AuthCard() {
         setError(res.error || "Registration failed");
       }
     } catch (err) {
-      setError("Something went wrong", err.message);
+      setError(err.message || "Something went wrong");
+    }finally {
+      setLoading(false);
     }
   };
   
@@ -63,13 +86,14 @@ export default function AuthCard() {
           <button
             className={`tab ${isLogin ? "active" : ""}`}
             onClick={() => setIsLogin(true)}
-            
+            disabled={loading || googleLoading}
           >
             Sign In
           </button>
           <button
             className={`tab ${!isLogin ? "active" : ""}`}
             onClick={() => setIsLogin(false)}
+            disabled={loading || googleLoading}
           >
             Register
           </button>
@@ -85,27 +109,31 @@ export default function AuthCard() {
                 type="email" 
                 placeholder="Email Address" 
                 value={email}
+                disabled={loading}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <input 
                 type="password" 
                 placeholder="Password"
                 value={password}
+                disabled={loading}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button className="submit-btn" onClick={handleLogin}>Sign In</button>
+              <button className="submit-btn" onClick={handleLogin} disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+              </button>
 
               {/* Social login buttons */}
               <p className="continue-with">or continue with</p>
               <div className="social-login">
-                {/* <button className="google-btn" onClick={handleGoogleLogin}>
-                  <img src="/google-icon.png" alt="Google" className="icon" />
-                  Google
-                </button> */}
-                <GoogleLogin
-                  onSuccess={handleGoogleLogin}
-                  onError={() => setError("Google login failed")}
-                />
+                {googleLoading ? (
+                  <p>Loading Google...</p>
+                ) : (
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={() => setError("Google login failed")}
+                  />
+                )}
 
               </div>
             </div>
@@ -117,29 +145,38 @@ export default function AuthCard() {
                 type="text" 
                 placeholder="Full Name"
                 value={fullName}
+                disabled={loading}
                 onChange={(e) => setFullName(e.target.value)}
               />
               <input 
                 type="email" 
                 placeholder="Email Address"
                 value={email}
+                disabled={loading}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <input 
                 type="password" 
                 placeholder="Password"
                 value={password}
+                disabled={loading}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button className="submit-btn" onClick={handleRegister}>Register</button>
+              <button className="submit-btn" onClick={handleRegister} disabled={loading}>
+                 {loading ? "Creating account..." : "Register"}
+              </button>
 
               {/* Social login buttons */}
               <p className="continue-with">or continue with</p>
               <div className="social-login">
-                <button className="google-btn" onClick={handleGoogleLogin}>
-                  <img src="/google-icon.png" alt="Google" className="icon" />
-                  Google
-                </button>
+                {googleLoading ? (
+                  <p>Loading Google...</p>
+                ) : (
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={() => setError("Google login failed")}
+                  />
+                )}
               </div>
 
             </div>

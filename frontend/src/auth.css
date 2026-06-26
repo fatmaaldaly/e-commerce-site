@@ -11,11 +11,11 @@ body, html {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #101010;
+  background-color: #ffffff;
 }
 
 .auth-card {
-  background-color: #292b29;
+  background-color: #fdfffd;
   padding: 30px;
   border-radius: 12px;
   width: 400px;
@@ -25,7 +25,7 @@ body, html {
 .tab-toggle {
   display: flex;
   margin-bottom: 20px;
-  background-color: #454745;
+  background-color: #e8eee8;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -43,8 +43,8 @@ body, html {
 }
 
 .tab-toggle .tab.active {
-  background-color: rgb(231, 209, 71);
-  color: #000;
+  background-color: rgb(165, 0, 54);
+  color: #ffffff;
 }
 
 .form-container {
@@ -70,13 +70,14 @@ body, html {
   border: none;
   outline: none;
   color: black;
+  background-color: #e8eee8;
 }
 
 .submit-btn {
   padding: 12px;
   border-radius: 6px;
-  background-color: rgb(231, 209, 71);
-  color: #000;
+  background-color: rgb(165, 0, 54);
+  color: #ffffff;
   font-weight: bold;
   border: none;
   cursor: pointer;
@@ -85,7 +86,7 @@ body, html {
 }
 
 .submit-btn:hover {
-  background-color: rgb(231, 211, 79);
+  background-color: rgb(232, 174, 174);
 }
 
 /* Slide animation */
@@ -144,7 +145,7 @@ body, html {
 
 .continue-with {
   text-align: center;
-  color: #ccc;
+  color: black;
   margin-top: 15px;
   font-size: 14px;
 
@@ -156,12 +157,12 @@ body, html {
   left: 30px;
   background: none;
   border: none;
-  color: #ccc;
+  color: #000000;
   font-size: 16px;
   cursor: pointer;
 }
 
 
 .back-button:hover {
-  color: rgb(231, 211, 79);
+  color: rgb(191, 190, 182);
 }

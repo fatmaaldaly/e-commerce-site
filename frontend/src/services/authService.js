@@ -9,7 +9,7 @@ export const registerRequest = async (fullName, email, password) => {
       email,
       password,
     });
-    return res.data;
+    return res.data.data;
   
   }catch(error){
     return {
@@ -25,7 +25,7 @@ export const loginRequest = async (email, password) => {
       email, 
       password,
     });
-    return res.data;
+    return res.data.data;
   
   }catch(error){
     return {
@@ -33,3 +33,18 @@ export const loginRequest = async (email, password) => {
     };
   }
 }
+
+
+export const googleLoginRequest = async (credential) => {
+  try {
+    const res = await api.post("/auth/google", {
+      credential,
+    });
+
+    return res.data.data;
+  } catch (error) {
+    return {
+      error: error.response?.data?.error || "Google login failed",
+    };
+  }
+};

@@ -1,7 +1,7 @@
 import pool from "../../db.js";
 
 
-export const getAllProducts = async (limit, offset) => {
+export const dbGetAllProducts = async (limit, offset) => {
     const result = await pool.query(
     `
     SELECT p.*, c.name AS category_name
@@ -17,7 +17,7 @@ export const getAllProducts = async (limit, offset) => {
 };
 
 
-export const countProducts = async () => {
+export const dbCountProducts = async () => {
     const result = await pool.query(
         "SELECT COUNT(*) FROM products"
     );

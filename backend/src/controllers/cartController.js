@@ -8,14 +8,10 @@ export const getCart = async (req, res, next) => {
 
     try{
      const cart = await getCartService(cart_id);
-     console.log("Cart items:", cart);
-     console.log("Controller Cart ID:", cart_id);
      return res.status(200).json({
       items: cart || [],
     });
 
-   
-    
     }catch(error){
         next(error);
     }
@@ -28,7 +24,6 @@ export const addItem = async (req, res, next) => {
 
     try{
       const newItem = await addToCartService(cart_id, product_id, quantity);
-      console.log("Inserted item:", newItem);
       res.status(201).json(newItem);  
     
     }catch (error) {

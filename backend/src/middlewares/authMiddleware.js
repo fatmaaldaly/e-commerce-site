@@ -1,22 +1,23 @@
 // middleware: Reusable request processing
 // for routes that require logged-in users
 
-import jwt from "jsonwebtoken";
+// JWT: constains  User ID, Email, Expiration, Signature
+import jwt from "jsonwebtoken"; 
+import { AppError } from "../utils/appError.js";
 
+
+// next -> function that moves request to next step
 export const authMiddleware = (req, res, next) => {
-  console.log("Authorization Header:", req.headers.authorization);
 
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({
-        error: "Unauthorized"
-      });
+      throw new AppError("Unauthorized: No token provided", 401);
     }
 
     // extract token from header
-    // ex: Bearer abc123token -> abc123token
+    // ["Bearer", "abc123token"] -> abc123token
     const token = authHeader.split(" ")[1];
     
     // verify token
@@ -31,6 +32,14 @@ export const authMiddleware = (req, res, next) => {
     next();
 
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+        return next(new AppError("Token expired", 401));
+      }
+
+      if (error.name === "JsonWebTokenError") {
+        return next(new AppError("Invalid token", 401));
+      }
+
     next(error);
   }
 };

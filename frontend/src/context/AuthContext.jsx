@@ -1,8 +1,8 @@
 // Creates a global state container for authentication.
 
 import { createContext, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-import {loginRequest, registerRequest} from "../services/authService";
+import {loginRequest, registerRequest, googleLoginRequest} 
+from "../services/authService";
 
 
 const AuthContext = createContext();
@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   // gets token from localStorage on first render, this keeps user logged in after refresh
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [userId, setUserId] = useState(() =>localStorage.getItem("user_id"));
-  // const navigate = useNavigate();
 
   // updates react state and saves data in localstorage
   const saveAuth = (token, userId) => {
@@ -31,15 +30,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user_id");
     window.location.href = "/login";
-    // navigate("/login");
   };
 
   const login = async (email, password) => {
     // calls api
     const data = await loginRequest(email, password);
-
+    
     if (data.token) {
-      saveAuth(data.token, data.user.id);
+      saveAuth(data.token, data.user.user_id);
     }
 
     return data;
@@ -49,15 +47,25 @@ export const AuthProvider = ({ children }) => {
     const data = await registerRequest(fullName, email, password);
 
     if (data.token) {
-      saveAuth(data.token, data.user.id);
+      saveAuth(data.token, data.user.user_id);
     }
 
     return data;
   };
 
+  const googleLogin = async (credential) => {
+  const data = await googleLoginRequest(credential);
+
+  if (data.token) {
+    saveAuth(data.token, data.user.user_id);
+  }
+
+  return data;
+};
+
   return (
     <AuthContext.Provider
-      value={{ token, userId, login, register, logout }}
+      value={{ token, userId, login, register, googleLogin, logout }}
     >
       {children}
     </AuthContext.Provider>

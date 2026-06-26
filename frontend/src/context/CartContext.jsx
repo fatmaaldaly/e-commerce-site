@@ -18,9 +18,7 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     if (!token) return;
     const data = await getCartRequest(token);
-    console.log("Cart API Response:", data);
     setCart(data.items || []);
-    console.log(data);
   };
 
   useEffect(() => {

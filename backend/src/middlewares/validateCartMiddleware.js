@@ -19,7 +19,8 @@ export const validateCart = async (req, res, next) => {
       if(!cart){
           cart = await createCart(user_id); 
       }
-      req.cart_id = cart.cart_id;  
+      // const cart_id = req.cart_id;  
+      req.cart_id = cart.cart_id;
       console.log("Cart ID:", req.cart_id);
       next();
 
