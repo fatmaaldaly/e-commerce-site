@@ -7,12 +7,15 @@ export const errorHandler = (
 
   console.error(err);
 
-  const statusCode = err.status || 500;
+  const statusCode = err.status || err.statusCode || 500;
 
+  // Unexpected (5xx) errors can contain database details such as table or
+  // constraint names, so only send a generic message to the client.
   res.status(statusCode).json({
     success: false,
     message:
-      err.message ||
-      "Internal Server Error",
+      statusCode >= 500
+        ? "Internal Server Error"
+        : err.message || "Something went wrong",
   });
 };

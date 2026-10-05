@@ -1,9 +1,18 @@
 import { register, login, googleLoginService } from "../services/authService.js";
 
-const COOKIE_OPTIONS = {
+const isProduction = process.env.NODE_ENV === "production";
+
+// In production the frontend and backend live on different *.vercel.app domains,
+// which browsers treat as different sites. A "lax" cookie would not be sent on
+// API calls, so production needs sameSite "none" (which requires secure: true).
+const BASE_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+};
+
+const COOKIE_OPTIONS = {
+  ...BASE_COOKIE_OPTIONS,
   maxAge: 5 * 60 * 60 * 1000, // 5 hours — matches JWT expiry
 };
 
@@ -42,11 +51,7 @@ export const googleLogin = async (req, res, next) => {
 
 
 export const logoutUser = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
+  res.clearCookie("token", BASE_COOKIE_OPTIONS);
   res.status(200).json({ success: true, message: "Logged out" });
 };
 

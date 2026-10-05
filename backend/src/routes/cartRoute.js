@@ -1,6 +1,6 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import {validateCart, validateCartInput} 
+import {validateCart, validateCartInput, validateCartUpdate, validateProductIdParam}
 from "../middlewares/validateCartMiddleware.js";
 import { addItem, getCart, removeItem, updateQuantity, clearCart} from "../controllers/cartController.js";
 
@@ -15,13 +15,13 @@ router.get("/", authMiddleware, validateCart, getCart);
 router.post("/add", authMiddleware, validateCart, validateCartInput, addItem);
 
 // update cart items quantity
-router.patch("/update", authMiddleware, validateCart, updateQuantity);
+router.patch("/update", authMiddleware, validateCart, validateCartUpdate, updateQuantity);
 
 // clear entire cart
 router.delete("/clear", authMiddleware, validateCart, clearCart);
 
 // remove items from cart
-router.delete("/:product_id", authMiddleware, validateCart, removeItem);
+router.delete("/:product_id", authMiddleware, validateCart, validateProductIdParam, removeItem);
 
 
 export default router;

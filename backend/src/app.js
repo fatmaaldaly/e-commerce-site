@@ -21,6 +21,10 @@ dotenv.config();
 
 const app = express();
 
+// Vercel sits in front of the app as a proxy; trust it so req.ip (used by the
+// auth rate limiter) is the real client IP instead of the proxy's.
+app.set("trust proxy", 1);
+
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 

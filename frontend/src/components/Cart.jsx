@@ -41,7 +41,7 @@ export default function Cart({isOpen, onClose}) {
 
               <div className="cart-item-details">
                 <h4>{item.name}</h4>
-                <p>${item.price}</p>
+                <p>EGP {Number(item.price).toFixed(2)}</p>
               </div>
 
               <div className="cart-item-quantity">
@@ -62,7 +62,7 @@ export default function Cart({isOpen, onClose}) {
       )}
 
       <div className="cart-total">
-        <h3>Total: ${total.toFixed(2)}</h3>
+        <h3>Total: EGP {total.toFixed(2)}</h3>
       </div>
 
 

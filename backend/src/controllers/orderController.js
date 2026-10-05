@@ -1,4 +1,4 @@
-import { checkoutService } from "../services/orderService.js";
+import { checkoutService, getMyOrdersService } from "../services/orderService.js";
 
 export const checkout = async (req, res, next) => {
     const user_id = req.user.user_id;
@@ -7,9 +7,19 @@ export const checkout = async (req, res, next) => {
 
     try{
         const result = await checkoutService(user_id, cart_id, 
-        { customer_name: name, phone_number: phone, shipping_address: address, payment_method: payment }
+        { customer_name: name.trim(), phone_number: phone.trim(), shipping_address: address.trim(), payment_method: payment }
         );
         res.status(201).json(result);
+    }catch(error){
+        next(error);
+    }
+}
+
+export const getMyOrders = async (req, res, next) => {
+    try{
+        // user_id comes from the verified token, so users only ever see their own orders
+        const orders = await getMyOrdersService(req.user.user_id);
+        res.status(200).json({ success: true, data: orders });
     }catch(error){
         next(error);
     }

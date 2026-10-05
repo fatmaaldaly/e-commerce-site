@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useCart } from "../hooks/useCart";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import checkout from "../services/checkoutService";
+import { getErrorMessage } from "../lib/api";
 
 export default function Checkout() {
-  const { cart } = useCart();
+  const { cart, fetchCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -17,6 +18,7 @@ export default function Checkout() {
   });
 
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   if (!isAuthenticated) return null;
 
@@ -24,13 +26,20 @@ export default function Checkout() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const validatePhone = (phone) => /^[0-9]{11}$/.test(phone);
+  // same rule as the backend (validateOrderMiddleware)
+  const validatePhone = (phone) => /^[0-9]{7,15}$/.test(phone.trim());
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+
+    if (!form.name.trim() || !form.address.trim()) {
+      setError("Please fill in your name and address");
+      return;
+    }
 
     if (!validatePhone(form.phone)) {
-      setError("Phone number must be 11 digits");
+      setError("Phone number must be 7–15 digits");
       return;
     }
 
@@ -40,23 +49,24 @@ export default function Checkout() {
     }
 
     try {
+      setError("");
+      setSubmitting(true);
       await checkout(form);
-      navigate("/success");
+      await fetchCart(); // the server empties the cart after a successful order
+      navigate("/success", { state: { orderPlaced: true } });
     } catch (err) {
-      setError(
-        err?.response?.data?.error ||
-          "Something went wrong while placing the order"
-      );
+      setError(getErrorMessage(err, "Something went wrong while placing the order"));
+      fetchCart(); // stock may have changed, refresh the summary
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <button>
-        <a href="/shop" className="text-black">
-          &larr; Back to Cart
-        </a>
-      </button>
+      <Link to="/shop" className="inline-block mb-4 text-black hover:underline">
+        &larr; Continue shopping
+      </Link>
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
           
@@ -82,9 +92,10 @@ export default function Checkout() {
               />
 
               <input
-                type="text"
+                type="tel"
                 name="phone"
-                placeholder="Phone (11 digits)"
+                placeholder="Phone number"
+                inputMode="numeric"
                 value={form.phone}
                 onChange={handleChange}
                 className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
@@ -116,23 +127,19 @@ export default function Checkout() {
                   Cash on Delivery
                 </label>
 
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="paymob"
-                    checked={form.payment === "paymob"}
-                    onChange={handleChange}
-                  />
-                  Paymob
+                {/* Online payment isn't implemented yet, so it can't be selected */}
+                <label className="flex items-center gap-2 text-gray-400 cursor-not-allowed">
+                  <input type="radio" name="payment" value="paymob" disabled />
+                  Card payment (Paymob) — coming soon
                 </label>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition"
+                disabled={submitting}
+                className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Place Order
+                {submitting ? "Placing order..." : "Place Order"}
               </button>
             </form>
           </div>
@@ -159,13 +166,13 @@ export default function Checkout() {
                     <div className="flex-1">
                       <h4 className="font-semibold">{item.name}</h4>
                       <p className="text-sm text-gray-600">
-                        Price: ${Number(item.price).toFixed(2)}
+                        Price: EGP {Number(item.price).toFixed(2)}
                       </p>
                       <p className="text-sm text-gray-600">
                         Qty: {item.quantity}
                       </p>
                       <p className="text-sm font-semibold">
-                        Subtotal: $
+                        Subtotal: EGP{" "}
                         {Number(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
@@ -176,7 +183,7 @@ export default function Checkout() {
 
             <div className="mt-6 border-t pt-4">
               <h3 className="text-lg font-bold">
-                Total: $
+                Total: EGP{" "}
                 {Number(
                   cart.reduce((sum, c) => sum + c.price * c.quantity, 0)
                 ).toFixed(2)}

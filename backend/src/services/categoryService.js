@@ -26,12 +26,7 @@ export const getCategoryProductsService = async (category_id) => {
     throw new AppError("Category not found", 404);
   }
 
-  return {
-    data: {
-    category,
-    products
-  }
-  };
+  return { category, products };
 };
 
 // how data is returned

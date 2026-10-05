@@ -1,16 +1,13 @@
-import { Link } from "react-router-dom";
-import { useCart } from "../hooks/useCart";
-import { useEffect } from "react";
+import { Link, Navigate, useLocation } from "react-router-dom";
 
 export default function Success() {
-  const { clearCart } = useCart();
+  const location = useLocation();
 
-  // Ensure the cart is cleared on the success page in case the server-side
-  // clear didn't propagate to the frontend context yet
-  useEffect(() => {
-    clearCart();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Only reachable right after checkout; visiting /success directly goes home.
+  // (The server already empties the cart as part of placing the order.)
+  if (!location.state?.orderPlaced) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-rose-50 px-4">

@@ -1,15 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import { Toaster } from "react-hot-toast";
 
 const Home = lazy(() => import("./pages/Home"));
 const Shop = lazy(() => import("./pages/Shop"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Success = lazy(() => import("./pages/Success"));
-// const Orders = lazy(() => import("./pages/Orders"));
+const Orders = lazy(() => import("./pages/Orders"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 
-import Cart from "./components/Cart";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
@@ -27,22 +28,27 @@ function App() {
           <CartProvider>
             <BrowserRouter>
               <ScrollToTop />
+              <Toaster position="top-center" />
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/shop" element={<Shop />} />
-                  <Route path="/cart" element={<Cart />} />
+                  {/* the cart is a sidebar in the navbar, not a page */}
+                  <Route path="/cart" element={<Navigate to="/shop" replace />} />
                   <Route path="/login" element={<Auth />} />
                   <Route path="/checkout" element={
                     <ProtectedRoute><Checkout /></ProtectedRoute>
                   } />
-                  {/* <Route path="/orders" element={
+                  <Route path="/orders" element={
                     <ProtectedRoute><Orders /></ProtectedRoute>
-                  } /> */}
-                  <Route path="/success" element={<Success />} />
+                  } />
+                  <Route path="/success" element={
+                    <ProtectedRoute><Success /></ProtectedRoute>
+                  } />
                   <Route path="/admin" element={
                     <AdminRoute><AdminDashboard /></AdminRoute>
                   } />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </BrowserRouter>

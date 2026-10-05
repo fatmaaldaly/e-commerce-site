@@ -14,9 +14,10 @@ const fetchCategories = useCallback(async () => {
     setError("");
 
     const data = await getCategories();
-    setCategories(data.data || []);
+    // trim names: stray whitespace in the DB (e.g. "Perfume\n") breaks matching
+    setCategories((data.data || []).map((c) => ({ ...c, name: c.name.trim() })));
   } catch (err) {
-    setError(err.response?.data?.error || "Failed to load categories");
+    setError(err.response?.data?.message || "Failed to load categories");
   } finally {
     setLoading(false);
   }

@@ -24,7 +24,9 @@ export default function ProductCard({ products = [] }) {
   const handleDecrease = (product) => {
     const currentQty = getQuantity(product.product_id);
 
-    if (currentQty <= 1) {
+    if (currentQty === 0) return; // not in cart, nothing to remove
+
+    if (currentQty === 1) {
       updateQuantity(product.product_id, 0); // remove
     } else {
       updateQuantity(product.product_id, currentQty - 1);

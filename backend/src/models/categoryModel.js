@@ -22,9 +22,10 @@ export const getCategoryById = async (category_id) => {
 export const getProductsByCategoryId = async (category_id) => {
   const result = await pool.query(
     `
-    SELECT product_id, name, price, category_id
+    SELECT product_id, name, price, stock, image_url, category_id
     FROM products
     WHERE category_id = $1
+    ORDER BY product_id
     `,
     [category_id],
   );

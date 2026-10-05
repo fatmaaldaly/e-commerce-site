@@ -52,7 +52,7 @@ export const removeItem = async (req, res, next) => {
     try {
         const removedItem = await removeFromCartService(cart_id, product_id);
         if (!removedItem) {
-            return res.status(404).json({ error: "Item not found in cart" });
+            return res.status(404).json({ success: false, message: "Item not found in cart" });
         }
         res.status(200).json(removedItem);
         
@@ -66,8 +66,8 @@ export const clearCart = async (req, res, next) => {
     const cart_id = req.cart_id;
 
     try {
-        const clearedCart = await clearCartService(cart_id);
-        res.status(200).json(clearedCart);
+        await clearCartService(cart_id);
+        res.status(200).json({ success: true, message: "Cart cleared" });
         
     } catch (error) {
         next(error);

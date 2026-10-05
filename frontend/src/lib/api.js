@@ -8,12 +8,21 @@ const api = axios.create({
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    // A 401 from login/register just means wrong credentials: let the form show
+    // the error. For anything else, the session expired, so send the user to log in.
+    const isAuthRequest = err.config?.url?.startsWith("/auth/");
+    if (err.response?.status === 401 && !isAuthRequest) {
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(err);
   }
 );
+
+// Backend errors look like { success: false, message: "..." }
+export const getErrorMessage = (err, fallback) =>
+  err?.response?.data?.message || fallback;
 
 export default api;

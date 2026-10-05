@@ -29,12 +29,14 @@ export const register = async ({ full_name, email, password }) => {
 export const login = async ({ email, password }) => {
   const user = await findUserByEmail(email);
 
-  if (!user) throw new AppError("Email not registered", 401);
+  // Same message for unknown email and wrong password, so the API
+  // doesn't reveal which emails are registered.
+  if (!user) throw new AppError("Invalid email or password", 401);
   if (user.auth_provider !== "local") throw new AppError("Use Google login", 400);
   if (!user.password) throw new AppError("Invalid login method for this account", 400);
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new AppError("Invalid password", 401);
+  if (!isMatch) throw new AppError("Invalid email or password", 401);
 
   const token = generateToken(user.user_id, user.email, user.role);
 
@@ -48,12 +50,25 @@ export const login = async ({ email, password }) => {
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleLoginService = async (credential) => {
-  const ticket = await client.verifyIdToken({
-    idToken: credential,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  });
+  if (!credential || typeof credential !== "string") {
+    throw new AppError("Google credential is required", 400);
+  }
 
-  const payload = ticket.getPayload();
+  let payload;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch {
+    throw new AppError("Invalid Google credential", 401);
+  }
+
+  if (!payload?.email || !payload.email_verified) {
+    throw new AppError("Google account email is not verified", 401);
+  }
+
   const email = payload.email;
   const full_name = payload.name;
 

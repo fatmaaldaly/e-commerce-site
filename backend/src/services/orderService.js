@@ -3,6 +3,7 @@ import {
   createOrder,
   createOrderItem,
   decreaseStock,
+  getOrdersByUser,
 } from "../models/orderModel.js";
 import { getCartItemsTx, clearCartTx } from "../models/cartModel.js";
 import { AppError } from "../utils/appError.js";
@@ -25,14 +26,20 @@ export const checkoutService = async (
       throw new AppError("Cart is empty", 400);
     }
 
-    // Validate stock and calculate total
-    let total = 0;
+    // Validate stock and calculate total.
+    // Prices come from the database (never from the client). Summing in whole
+    // cents avoids floating-point results like 0.1 + 0.2 = 0.30000000000000004.
+    let totalCents = 0;
     for (const item of cartItems) {
+      if (!item.quantity || item.quantity <= 0) {
+        throw new AppError(`Invalid quantity for "${item.name}"`, 400);
+      }
       if (item.stock < item.quantity) {
         throw new AppError(`Insufficient stock for "${item.name}"`, 400);
       }
-      total += item.price * item.quantity;
+      totalCents += Math.round(Number(item.price) * 100) * item.quantity;
     }
+    const total = totalCents / 100;
 
     const order = await createOrder(client, user_id, total, {
       customer_name,
@@ -67,4 +74,8 @@ export const checkoutService = async (
   } finally {
     client.release();
   }
+};
+
+export const getMyOrdersService = async (user_id) => {
+  return await getOrdersByUser(user_id);
 };

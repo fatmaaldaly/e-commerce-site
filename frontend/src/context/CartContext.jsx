@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
 import {
   getCartRequest,
   addToCartRequest,
@@ -7,13 +8,13 @@ import {
   clearCartRequest,
 } from "../services/cartService";
 import { useAuth } from "../hooks/useAuth";
+import { getErrorMessage } from "../lib/api";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const [cart, setCart] = useState([]);
-  const [cartError, setCartError] = useState(null);
 
   const fetchCart = useCallback(async () => {
     if (!isAuthenticated) {
@@ -39,11 +40,11 @@ export const CartProvider = ({ children }) => {
       return;
     }
     try {
-      setCartError(null);
       await addToCartRequest(product.product_id);
       await fetchCart();
+      toast.success(`${product.name} added to cart`);
     } catch (err) {
-      setCartError(err?.response?.data?.message || "Failed to add item to cart");
+      toast.error(getErrorMessage(err, "Failed to add item to cart"));
     }
   };
 
@@ -51,33 +52,30 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (product_id, quantity) => {
     if (quantity <= 0) return removeFromCart(product_id);
     try {
-      setCartError(null);
       await updateQuantityRequest(product_id, quantity);
       await fetchCart();
     } catch (err) {
-      setCartError(err?.response?.data?.message || "Failed to update quantity");
+      toast.error(getErrorMessage(err, "Failed to update quantity"));
     }
   };
 
 
   const removeFromCart = async (product_id) => {
     try {
-      setCartError(null);
       await removeFromCartRequest(product_id);
       await fetchCart();
     } catch (err) {
-      setCartError(err?.response?.data?.message || "Failed to remove item");
+      toast.error(getErrorMessage(err, "Failed to remove item"));
     }
   };
 
 
   const clearCart = async () => {
     try {
-      setCartError(null);
       await clearCartRequest();
       await fetchCart();
     } catch (err) {
-      setCartError(err?.response?.data?.message || "Failed to clear cart");
+      toast.error(getErrorMessage(err, "Failed to clear cart"));
     }
   };
 
@@ -86,7 +84,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cart, total, cartError, addToCart, updateQuantity, removeFromCart, clearCart }}
+      value={{ cart, total, fetchCart, addToCart, updateQuantity, removeFromCart, clearCart }}
     >
       {children}
     </CartContext.Provider>
