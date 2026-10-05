@@ -1,27 +1,19 @@
-import NavBar from '../components/NavBar'
-import Hero from '../components/Hero'
-import Footer from '../components/Footer'
-import Features from '../components/Features'
-import Category from '../components/Category'
-import MostPopular from '@/components/MostPopular'
-import Brand from "../components/Brand";
+import NavBar from '../components/NavBar';
+import Hero from '../components/Hero';
+import Footer from '../components/Footer';
+import Category from '../components/Category';
+import BestSeller from '../components/BestSeller';
+import Brand from '../components/Brand';
 
 export default function Home() {
-  
-
   return (
     <div>
-      <NavBar/>
-      <Hero/>
-      
-      <Category/>
-      <Brand/>
-      <MostPopular/>
-     
-      <Footer/> 
+      <NavBar />
+      <Hero />
+      <Category />
+      <Brand />
+      <BestSeller />
+      <Footer />
     </div>
-   
-  )
-
-
+  );
 }

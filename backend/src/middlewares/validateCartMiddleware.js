@@ -17,11 +17,9 @@ export const validateCart = async (req, res, next) => {
     try{
       let cart = await getUserCart(user_id);
       if(!cart){
-          cart = await createCart(user_id); 
+          cart = await createCart(user_id);
       }
-      // const cart_id = req.cart_id;  
       req.cart_id = cart.cart_id;
-      console.log("Cart ID:", req.cart_id);
       next();
 
     }catch(err){
@@ -32,8 +30,6 @@ export const validateCart = async (req, res, next) => {
 
 
 export const validateCartInput = (req, res, next) => {
-
-   console.log("Request body:", req.body);
       const { product_id, quantity } = req.body;
 
       if (!product_id) 

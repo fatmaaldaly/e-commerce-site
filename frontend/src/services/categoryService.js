@@ -2,7 +2,6 @@ import api from "../lib/api";
 
 // get all categories
 export const getCategories = async () => {
-   console.trace("getCategories called")
   const res = await api.get("/categories");
   return res.data;
 };

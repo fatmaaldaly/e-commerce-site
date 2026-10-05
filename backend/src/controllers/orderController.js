@@ -3,7 +3,6 @@ import { checkoutService } from "../services/orderService.js";
 export const checkout = async (req, res, next) => {
     const user_id = req.user.user_id;
     const cart_id = req.cart_id;
-    console.log("BODY:", req.body);
     const { name, phone, address, payment } = req.body;
 
     try{

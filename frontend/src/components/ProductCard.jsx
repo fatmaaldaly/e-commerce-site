@@ -5,14 +5,11 @@ export default function ProductCard({ products = [] }) {
   const list = Array.isArray(products) ? products : [];
   const { cart, addToCart, updateQuantity } = useCart();
 
-
   // Get quantity from cart 
   const getQuantity = (productId) => {
     const item = cart.find((i) => i.product_id === productId);
     return item ? item.quantity : 0;
   };
-
-
 
   const handleIncrease = (product) => {
     const currentQty = getQuantity(product.product_id);

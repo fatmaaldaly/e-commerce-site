@@ -1,34 +1,24 @@
-import pool from "../../db.js";
+import { AppError } from "../utils/appError.js";
 
-export const validateOrder = async (req, res, next) =>{
-   
+export const validateOrder = (req, res, next) => {
+  const { name, phone, address, payment } = req.body;
 
-    const user_id = req.user.user_id;
-    // ensure user is authenticated
-    if(!user_id){
-        return res.status(401).json({ error: "unauthorized" });
-    }
+  if (!name?.trim()) {
+    return next(new AppError("Full name is required", 400));
+  }
 
-    try{
+  if (!phone?.trim() || !/^[0-9]{7,15}$/.test(phone.trim())) {
+    return next(new AppError("A valid phone number is required (7–15 digits)", 400));
+  }
 
-    //ensure user has a cart and fetch it
-    
-    //ensure cart has items
-    
-     
-    //validate each cart item
-    //ensure valid quantity and price
-   
-    // Attach validated cart_id to request object
-    // This avoids querying the cart again in the route handler
-    req.cart_id = cart_id;
+  if (!address?.trim()) {
+    return next(new AppError("Shipping address is required", 400));
+  }
 
-    // Allow the request to continue to the next middleware or controller
-    next();
+  const allowedPayments = ["cod", "paymob"];
+  if (!payment || !allowedPayments.includes(payment)) {
+    return next(new AppError(`Payment method must be one of: ${allowedPayments.join(", ")}`, 400));
+  }
 
-    }catch(err){
-        console.error("Error validating order:", err);
-        res.status(500).json({ message: "Error validating order" });
-    }
-
-}
+  next();
+};

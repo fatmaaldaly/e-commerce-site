@@ -7,14 +7,11 @@ import { useAuth } from "../hooks/useAuth";
 export default function Cart({isOpen, onClose}) {
   const { cart, total,  updateQuantity, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
-  const { token } = useAuth(); 
-  
+  const { isAuthenticated } = useAuth();
 
   const handleCheckout = () => {
-    if (!token) {
-      navigate("/login", {
-        state: { from: "checkout" }
-      });
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: "checkout" } });
     } else {
       navigate("/checkout");
     }

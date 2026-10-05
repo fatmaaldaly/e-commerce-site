@@ -4,7 +4,7 @@ import {
   getProductsByCategoryId
 } from "../models/categoryModel.js";
 
-import { AppError } from "../utils/AppError.js";
+import { AppError } from "../utils/appError.js";
 
 
 // Get all categories

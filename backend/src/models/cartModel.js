@@ -61,8 +61,6 @@ export const updateCartItemQuantity = async (cart_id, product_id, quantity) => {
 
 // for fetching full cart
 export const getCartItems = async (cart_id) => {
-    console.log("DB Cart ID:", cart_id);
-
     const cart = await pool.query(
         `SELECT 
          ci.product_id,
@@ -110,4 +108,25 @@ export const clearCartTx = async (client, cart_id) => {
       `,
       [cart_id]
     );
+};
+
+
+// for reading cart items within transaction (with product row lock)
+export const getCartItemsTx = async (client, cart_id) => {
+    const result = await client.query(
+        `SELECT
+         ci.product_id,
+         ci.quantity,
+         p.name,
+         p.price,
+         p.stock,
+         p.image_url
+         FROM cart_items ci
+         JOIN products p ON ci.product_id = p.product_id
+         WHERE ci.cart_id = $1
+         ORDER BY ci.cart_item_id
+         FOR UPDATE OF p`,
+        [cart_id]
+    );
+    return result.rows;
 };

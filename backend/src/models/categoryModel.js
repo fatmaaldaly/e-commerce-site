@@ -27,7 +27,7 @@ export const getProductsByCategoryId = async (category_id) => {
     SELECT product_id, name, price, category_id
     FROM products
     WHERE category_id = $1
-    `
+    `,
     [category_id]
   );
 

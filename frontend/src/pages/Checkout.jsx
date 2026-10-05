@@ -6,7 +6,7 @@ import checkout from "../services/checkoutService";
 
 export default function Checkout() {
   const { cart } = useCart();
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -18,7 +18,7 @@ export default function Checkout() {
 
   const [error, setError] = useState("");
 
-  if (!token) return null;
+  if (!isAuthenticated) return null;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

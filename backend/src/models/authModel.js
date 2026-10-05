@@ -36,7 +36,7 @@ export const createUser = async ({
     `
     INSERT INTO users (full_name, email, password, auth_provider)
     VALUES ($1, $2, $3, $4)
-    RETURNING user_id
+    RETURNING user_id, role
     `,
     [full_name, email, password, auth_provider]
   );

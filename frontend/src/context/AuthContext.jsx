@@ -1,71 +1,65 @@
-// Creates a global state container for authentication.
-
 import { createContext, useState } from "react";
-import {loginRequest, registerRequest, googleLoginRequest} 
-from "../services/authService";
-
+import { loginRequest, registerRequest, googleLoginRequest, logoutRequest }
+  from "../services/authService";
 
 const AuthContext = createContext();
 
-// this wraps your app, everything inside gets access to the auth context
-export const AuthProvider = ({ children }) => {
-  // gets token from localStorage on first render, this keeps user logged in after refresh
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [userId, setUserId] = useState(() =>localStorage.getItem("user_id"));
+const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
 
-  // updates react state and saves data in localstorage
-  const saveAuth = (token, userId) => {
-    // React state → for UI updates
-    setToken(token); 
-    setUserId(userId);
-    // localStorage → for persistence
-    localStorage.setItem("token", token);
-    localStorage.setItem("user_id", userId);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(getStoredUser);
+
+  const saveUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = () => {
-    setToken(null);
-    setUserId(null);
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user_id");
-    window.location.href = "/login";
+  const clearUser = () => {
+    setUser(null);
+    localStorage.removeItem("user");
   };
 
   const login = async (email, password) => {
-    // calls api
     const data = await loginRequest(email, password);
-    
-    if (data.token) {
-      saveAuth(data.token, data.user.user_id);
-    }
-
+    if (data.user) saveUser(data.user);
     return data;
   };
 
   const register = async (fullName, email, password) => {
     const data = await registerRequest(fullName, email, password);
-
-    if (data.token) {
-      saveAuth(data.token, data.user.user_id);
-    }
-
+    if (data.user) saveUser(data.user);
     return data;
   };
 
   const googleLogin = async (credential) => {
-  const data = await googleLoginRequest(credential);
+    const data = await googleLoginRequest(credential);
+    if (data.user) saveUser(data.user);
+    return data;
+  };
 
-  if (data.token) {
-    saveAuth(data.token, data.user.user_id);
-  }
-
-  return data;
-};
+  const logout = async () => {
+    await logoutRequest();
+    clearUser();
+    window.location.href = "/login";
+  };
 
   return (
     <AuthContext.Provider
-      value={{ token, userId, login, register, googleLogin, logout }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        login,
+        register,
+        googleLogin,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

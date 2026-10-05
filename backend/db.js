@@ -1,9 +1,10 @@
-import pkg from 'pg';
-import dotenv from 'dotenv';
+import pkg from "pg";
+import dotenv from "dotenv";
 
 dotenv.config();
 const { Pool } = pkg;
 
+const isProduction = process.env.NODE_ENV === "production";
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -11,16 +12,19 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+  // Require SSL in production (cloud Postgres providers mandate this)
+  ...(isProduction && { ssl: { rejectUnauthorized: false } }),
 });
 
-
-// Test DB connection
-pool.connect()
-  .then(client => {
+pool
+  .connect()
+  .then((client) => {
     console.log("Connected to Postgres!");
     client.release();
   })
-  .catch(err => console.error("Postgres connection error:", err));
-
+  .catch((err) => console.error("Postgres connection error:", err));
 
 export default pool;

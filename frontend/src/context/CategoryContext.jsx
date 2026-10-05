@@ -4,7 +4,6 @@ import { getCategories } from "../services/categoryService";
 const CategoryContext = createContext();
 
 export const CategoryProvider = ({ children }) => {
-   console.count("CategoryProvider render");
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

@@ -38,13 +38,20 @@ export const createOrderItem = async (
 }
 
 
-// update stock
+// update stock — atomic: only decrements if sufficient stock remains
 export const decreaseStock = async (client, product_id, quantity) => {
     const result = await client.query(
         `UPDATE products
         SET stock = stock - $1
-        WHERE product_id = $2`,
+        WHERE product_id = $2
+          AND stock >= $1
+        RETURNING product_id`,
         [quantity, product_id]
-    )
+    );
+
+    if (result.rowCount === 0) {
+        throw new Error(`Insufficient stock for product_id ${product_id}`);
+    }
+
     return result.rows[0];
-}
+};
