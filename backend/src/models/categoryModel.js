@@ -1,10 +1,8 @@
-import pool from "../../db.js";
+import pool from "../db.js";
 
 // Get all categories
 export const getAllCategories = async () => {
-  const result = await pool.query(
-    "SELECT * FROM categories"
-  );
+  const result = await pool.query("SELECT * FROM categories");
 
   return result.rows;
 };
@@ -15,7 +13,7 @@ export const getCategoryById = async (category_id) => {
     `
     SELECT * FROM categories 
     WHERE category_id = $1`,
-    [category_id]
+    [category_id],
   );
   return result.rows[0];
 };
@@ -28,7 +26,7 @@ export const getProductsByCategoryId = async (category_id) => {
     FROM products
     WHERE category_id = $1
     `,
-    [category_id]
+    [category_id],
   );
 
   return result.rows;
